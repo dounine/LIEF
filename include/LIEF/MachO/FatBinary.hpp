@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_FAT_BINARY_H
 #define LIEF_MACHO_FAT_BINARY_H
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -24,111 +25,123 @@
 #include "LIEF/MachO/Header.hpp"
 
 namespace LIEF {
-class Parser;
-namespace MachO {
+    class Parser;
+    namespace MachO {
 
-class Parser;
-class Builder;
-class Binary;
+        class Parser;
+
+        class Builder;
+
+        class Binary;
 
 /// Class which represent a Mach-O (fat) binary
 /// This object is also used for representing Mach-O binaries that are **NOT FAT**
-class LIEF_API FatBinary {
+        class LIEF_API FatBinary {
 
-  friend class LIEF::Parser;
-  friend class Parser;
-  friend class Builder;
+            friend class LIEF::Parser;
 
-  public:
+            friend class Parser;
 
-  /// Internal containter used to store Binary objects within a Fat Mach-O
-  using binaries_t = std::vector<std::unique_ptr<Binary>>;
+            friend class Builder;
 
-  /// Iterator that outputs Binary&
-  using it_binaries = ref_iterator<binaries_t&, Binary*>;
+        public:
 
-  /// Iterator that outputs const Binary&
-  using it_const_binaries = const_ref_iterator<const binaries_t&, Binary*>;
+            /// Internal containter used to store Binary objects within a Fat Mach-O
+            using binaries_t = std::vector<std::unique_ptr<Binary>>;
 
-  FatBinary(const FatBinary&) = delete;
-  FatBinary& operator=(const FatBinary&) = delete;
+            /// Iterator that outputs Binary&
+            using it_binaries = ref_iterator<binaries_t &, Binary *>;
 
-  virtual ~FatBinary();
+            /// Iterator that outputs const Binary&
+            using it_const_binaries = const_ref_iterator<const binaries_t &, Binary *>;
 
-  /// Number of MachO::Binary wrapped by this object
-  size_t size() const {
-    return binaries_.size();
-  }
+            FatBinary(const FatBinary &) = delete;
 
-  /// Checks whether this object contains MachO::Binary
-  bool empty() const {
-    return binaries_.empty();
-  }
+            FatBinary &operator=(const FatBinary &) = delete;
 
-  it_binaries begin() {
-    return binaries_;
-  }
-  it_const_binaries begin() const {
-    return binaries_;
-  }
+            virtual ~FatBinary();
 
-  it_binaries end() {
-    return it_binaries(binaries_).end();
-  }
+            /// Number of MachO::Binary wrapped by this object
+            size_t size() const {
+                return binaries_.size();
+            }
 
-  it_const_binaries end() const {
-    return it_const_binaries(binaries_).end();
-  }
+            /// Checks whether this object contains MachO::Binary
+            bool empty() const {
+                return binaries_.empty();
+            }
 
-  void release_all_binaries();
+            it_binaries begin() {
+                return binaries_;
+            }
 
-  /// Get a pointer to the last MachO::Binary object presents in this Fat Binary.
-  /// It returns a nullptr if no binary are present.
-  std::unique_ptr<Binary> pop_back();
+            it_const_binaries begin() const {
+                return binaries_;
+            }
 
-  /// Get a pointer to the MachO::Binary specified by the ``index``.
-  /// It returns a nullptr if the binary does not exist at the given index.
-  Binary*       at(size_t index);
-  const Binary* at(size_t index) const;
+            it_binaries end() {
+                return it_binaries(binaries_).end();
+            }
 
-  Binary*       back();
-  const Binary* back() const;
+            it_const_binaries end() const {
+                return it_const_binaries(binaries_).end();
+            }
 
-  Binary*       front();
-  const Binary* front() const;
+            void release_all_binaries();
 
-  Binary* operator[](size_t index) {
-    return at(index);
-  }
-  const Binary* operator[](size_t index) const {
-    return at(index);
-  }
+            /// Get a pointer to the last MachO::Binary object presents in this Fat Binary.
+            /// It returns a nullptr if no binary are present.
+            std::unique_ptr<Binary> pop_back();
 
-  /// Extract a MachO::Binary object. Gives ownership to the caller, and
-  /// remove it from this FatBinary object.
-  ///
-  /// @warning: this invalidates any previously hold iterator!
-  std::unique_ptr<Binary> take(size_t index);
+            /// Get a pointer to the MachO::Binary specified by the ``index``.
+            /// It returns a nullptr if the binary does not exist at the given index.
+            Binary *at(size_t index);
 
-  /// Take the underlying MachO::Binary that matches the given architecture
-  /// If no binary with the architecture can be found, return a nullptr
-  std::unique_ptr<Binary> take(Header::CPU_TYPE cpu);
+            const Binary *at(size_t index) const;
 
-  /// Reconstruct the Fat binary object and write it in `filename`
-  /// @param filename Path to write the reconstructed binary
-  void write(const std::string& filename);
+            Binary *back();
 
-  /// Reconstruct the Fat binary object and return his content as bytes
-  std::vector<uint8_t> raw();
+            const Binary *back() const;
 
-  LIEF_API friend std::ostream& operator<<(std::ostream& os, const FatBinary& fatbinary);
+            Binary *front();
 
-  private:
-  FatBinary();
-  FatBinary(binaries_t binaries);
-  binaries_t binaries_;
-};
+            const Binary *front() const;
 
-} // namespace MachO
+            Binary *operator[](size_t index) {
+                return at(index);
+            }
+
+            const Binary *operator[](size_t index) const {
+                return at(index);
+            }
+
+            /// Extract a MachO::Binary object. Gives ownership to the caller, and
+            /// remove it from this FatBinary object.
+            ///
+            /// @warning: this invalidates any previously hold iterator!
+            std::unique_ptr<Binary> take(size_t index);
+
+            /// Take the underlying MachO::Binary that matches the given architecture
+            /// If no binary with the architecture can be found, return a nullptr
+            std::unique_ptr<Binary> take(Header::CPU_TYPE cpu);
+
+            /// Reconstruct the Fat binary object and write it in `filename`
+            /// @param filename Path to write the reconstructed binary
+            void write(const std::string &filename);
+
+            /// Reconstruct the Fat binary object and return his content as bytes
+            std::vector<uint8_t> raw();
+
+            LIEF_API friend std::ostream &operator<<(std::ostream &os, const FatBinary &fatbinary);
+
+        private:
+            FatBinary();
+
+            FatBinary(binaries_t binaries);
+
+            binaries_t binaries_;
+        };
+
+    } // namespace MachO
 } // namespace LIEF
 #endif

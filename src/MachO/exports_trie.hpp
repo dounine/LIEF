@@ -15,20 +15,23 @@
  */
 #ifndef LIEF_MACHO_EXPORTS_TRIE_H
 #define LIEF_MACHO_EXPORTS_TRIE_H
+
 #include <ostream>
 #include <vector>
 #include <string>
 #include <memory>
 
 namespace LIEF {
-class BinaryStream;
-namespace MachO {
-class ExportInfo;
-using exports_list_t = std::vector<std::unique_ptr<ExportInfo>>;
-void show_trie(std::ostream& output, std::string output_prefix,
-               BinaryStream& stream, uint64_t start, uint64_t end, const std::string& prefix);
+    class BinaryStream;
+    namespace MachO {
+        class ExportInfo;
 
-std::vector<uint8_t> create_trie(const exports_list_t& exports, size_t pointer_size);
-}
+        using exports_list_t = std::vector<std::unique_ptr<ExportInfo>>;
+
+        void show_trie(std::ostream &output, std::string output_prefix,
+                       BinaryStream &stream, uint64_t start, uint64_t end, const std::string &prefix);
+
+        std::vector<uint8_t> create_trie(const exports_list_t &exports, size_t pointer_size);
+    }
 }
 #endif

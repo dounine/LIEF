@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_DATA_IN_CODE_COMMAND_H
 #define LIEF_MACHO_DATA_IN_CODE_COMMAND_H
+
 #include <vector>
 #include <ostream>
 
@@ -26,96 +27,102 @@
 #include "LIEF/MachO/DataCodeEntry.hpp"
 
 namespace LIEF {
-namespace MachO {
-class BinaryParser;
-class LinkEdit;
+    namespace MachO {
+        class BinaryParser;
 
-namespace details {
-struct linkedit_data_command;
-}
+        class LinkEdit;
+
+        namespace details {
+            struct linkedit_data_command;
+        }
 
 /// Interface of the LC_DATA_IN_CODE command
 /// This command is used to list slices of code sections that contain data. The *slices*
 /// information are stored as an array of DataCodeEntry
 ///
 /// @see DataCodeEntry
-class LIEF_API DataInCode : public LoadCommand {
-  friend class BinaryParser;
-  friend class LinkEdit;
-  public:
-  using entries_t        = std::vector<DataCodeEntry>;
-  using it_const_entries = const_ref_iterator<const entries_t&>;
-  using it_entries       = ref_iterator<entries_t&>;
+        class LIEF_API DataInCode : public LoadCommand {
+            friend class BinaryParser;
 
-  public:
-  DataInCode() = default;
-  DataInCode(const details::linkedit_data_command& cmd);
+            friend class LinkEdit;
 
-  DataInCode& operator=(const DataInCode&) = default;
-  DataInCode(const DataInCode&) = default;
+        public:
+            using entries_t = std::vector<DataCodeEntry>;
+            using it_const_entries = const_ref_iterator<const entries_t &>;
+            using it_entries = ref_iterator<entries_t &>;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<DataInCode>(new DataInCode(*this));
-  }
+        public:
+            DataInCode() = default;
 
-  /// Start of the array of the DataCodeEntry entries
-  uint32_t data_offset() const {
-    return data_offset_;
-  }
+            DataInCode(const details::linkedit_data_command &cmd);
 
-  /// Size of the raw array (``size = sizeof(DataCodeEntry) * nb_elements``)
-  uint32_t data_size() const {
-    return data_size_;
-  }
+            DataInCode &operator=(const DataInCode &) = default;
 
-  void data_offset(uint32_t offset) {
-    data_offset_ = offset;
-  }
-  void data_size(uint32_t size) {
-    data_size_ = size;
-  }
+            DataInCode(const DataInCode &) = default;
 
-  /// Add a new entry
-  DataInCode& add(DataCodeEntry entry) {
-    entries_.push_back(std::move(entry));
-    return *this;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<DataInCode>(new DataInCode(*this));
+            }
 
-  /// Iterator over the DataCodeEntry
-  it_const_entries entries() const {
-    return entries_;
-  }
+            /// Start of the array of the DataCodeEntry entries
+            uint32_t data_offset() const {
+                return data_offset_;
+            }
 
-  it_entries entries() {
-    return entries_;
-  }
+            /// Size of the raw array (``size = sizeof(DataCodeEntry) * nb_elements``)
+            uint32_t data_size() const {
+                return data_size_;
+            }
 
-  span<uint8_t> content() {
-    return content_;
-  }
+            void data_offset(uint32_t offset) {
+                data_offset_ = offset;
+            }
 
-  span<const uint8_t> content() const {
-    return content_;
-  }
+            void data_size(uint32_t size) {
+                data_size_ = size;
+            }
 
-  ~DataInCode() override = default;
+            /// Add a new entry
+            DataInCode &add(DataCodeEntry entry) {
+                entries_.push_back(std::move(entry));
+                return *this;
+            }
 
-  void accept(Visitor& visitor) const override;
+            /// Iterator over the DataCodeEntry
+            it_const_entries entries() const {
+                return entries_;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            it_entries entries() {
+                return entries_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::DATA_IN_CODE;
-  }
+            span<uint8_t> content() {
+                return content_;
+            }
 
-  private:
-  uint32_t  data_offset_ = 0;
-  uint32_t  data_size_   = 0;
-  entries_t entries_;
-  span<uint8_t> content_;
+            span<const uint8_t> content() const {
+                return content_;
+            }
 
-};
+            ~DataInCode() override = default;
 
-}
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::DATA_IN_CODE;
+            }
+
+        private:
+            uint32_t data_offset_ = 0;
+            uint32_t data_size_ = 0;
+            entries_t entries_;
+            span<uint8_t> content_;
+
+        };
+
+    }
 }
 #endif

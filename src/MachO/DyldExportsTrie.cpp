@@ -26,61 +26,61 @@
 #include "MachO/exports_trie.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-DyldExportsTrie::DyldExportsTrie() = default;
-DyldExportsTrie::~DyldExportsTrie() = default;
-DyldExportsTrie::DyldExportsTrie(const DyldExportsTrie& other) :
-  LoadCommand::LoadCommand(other),
-  data_offset_{other.data_offset_},
-  data_size_{other.data_size_}
-{
-  /* Do not copy export info */
-}
+        DyldExportsTrie::DyldExportsTrie() = default;
 
-DyldExportsTrie& DyldExportsTrie::operator=(DyldExportsTrie other) {
-  swap(other);
-  return *this;
-}
+        DyldExportsTrie::~DyldExportsTrie() = default;
 
-DyldExportsTrie::DyldExportsTrie(const details::linkedit_data_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
-  data_offset_{cmd.dataoff},
-  data_size_{cmd.datasize}
-{}
+        DyldExportsTrie::DyldExportsTrie(const DyldExportsTrie &other) :
+                LoadCommand::LoadCommand(other),
+                data_offset_{other.data_offset_},
+                data_size_{other.data_size_} {
+            /* Do not copy export info */
+        }
+
+        DyldExportsTrie &DyldExportsTrie::operator=(DyldExportsTrie other) {
+            swap(other);
+            return *this;
+        }
+
+        DyldExportsTrie::DyldExportsTrie(const details::linkedit_data_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
+                data_offset_{cmd.dataoff},
+                data_size_{cmd.datasize} {}
 
 
-void DyldExportsTrie::swap(DyldExportsTrie& other) noexcept {
-  LoadCommand::swap(other);
-  std::swap(data_offset_, other.data_offset_);
-  std::swap(data_size_,   other.data_size_);
-  std::swap(content_,     other.content_);
-  std::swap(export_info_, other.export_info_);
-}
+        void DyldExportsTrie::swap(DyldExportsTrie &other) noexcept {
+            LoadCommand::swap(other);
+            std::swap(data_offset_, other.data_offset_);
+            std::swap(data_size_, other.data_size_);
+            std::swap(content_, other.content_);
+            std::swap(export_info_, other.export_info_);
+        }
 
-void DyldExportsTrie::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void DyldExportsTrie::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-void DyldExportsTrie::add(std::unique_ptr<ExportInfo> info) {
-  export_info_.push_back(std::move(info));
-}
+        void DyldExportsTrie::add(std::unique_ptr<ExportInfo> info) {
+            export_info_.push_back(std::move(info));
+        }
 
-std::string DyldExportsTrie::show_export_trie() const {
-  std::ostringstream output;
+        std::string DyldExportsTrie::show_export_trie() const {
+            std::ostringstream output;
 
-  SpanStream stream = content_;
-  show_trie(output, "", stream, 0, content_.size(), "");
+            SpanStream stream = content_;
+            show_trie(output, "", stream, 0, content_.size(), "");
 
-  return output.str();
-}
+            return output.str();
+        }
 
-std::ostream& DyldExportsTrie::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << fmt::format("offset=0x{:06x}, size=0x{:06x}",
-                     data_offset(), data_size());
-  return os;
-}
+        std::ostream &DyldExportsTrie::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << fmt::format("offset=0x{:06x}, size=0x{:06x}",
+                              data_offset(), data_size());
+            return os;
+        }
 
-}
+    }
 }

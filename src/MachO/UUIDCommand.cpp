@@ -20,28 +20,27 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
 
-UUIDCommand::UUIDCommand(const details::uuid_command& uuid) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(uuid.cmd), uuid.cmdsize}
-{
-  std::copy(std::begin(uuid.uuid), std::end(uuid.uuid), std::begin(uuid_));
-}
+        UUIDCommand::UUIDCommand(const details::uuid_command &uuid) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(uuid.cmd), uuid.cmdsize} {
+            std::copy(std::begin(uuid.uuid), std::end(uuid.uuid), std::begin(uuid_));
+        }
 
-void UUIDCommand::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void UUIDCommand::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& UUIDCommand::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  for (uint32_t x : uuid()) {
-    os << fmt::format("{:02x}", x) << ' ';
-  }
-  os << ' ';
-  return os;
-}
+        std::ostream &UUIDCommand::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            for (uint32_t x: uuid()) {
+                os << fmt::format("{:02x}", x) << ' ';
+            }
+            os << ' ';
+            return os;
+        }
 
 
-}
+    }
 }

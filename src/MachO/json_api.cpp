@@ -18,22 +18,24 @@
 #include "LIEF/MachO.hpp"
 
 #ifdef LIEF_JSON_SUPPORT
+
 #include "MachO/json_internal.hpp"
+
 #endif
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-std::string to_json(const Object& v) {
+        std::string to_json(const Object &v) {
 #ifdef LIEF_JSON_SUPPORT
-  JsonVisitor visitor;
-  visitor(v);
-  return visitor.get();
+            JsonVisitor visitor;
+            visitor(v);
+            return visitor.get();
 #else
-  LIEF_WARN("JSON support is not enabled");
-  return "";
+            LIEF_WARN("JSON support is not enabled");
+            return "";
 #endif
-}
+        }
 
-} // namespace MachO
+    } // namespace MachO
 } // namespace LIEF

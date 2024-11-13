@@ -22,44 +22,43 @@
 #include "LIEF/MachO/DylibCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-BindingInfo::BindingInfo(const BindingInfo& other) :
-  Object{other},
-  library_ordinal_{other.library_ordinal_},
-  addend_{other.addend_},
-  is_weak_import_{other.is_weak_import_},
-  address_{other.address_}
-{}
+        BindingInfo::BindingInfo(const BindingInfo &other) :
+                Object{other},
+                library_ordinal_{other.library_ordinal_},
+                addend_{other.addend_},
+                is_weak_import_{other.is_weak_import_},
+                address_{other.address_} {}
 
-void BindingInfo::swap(BindingInfo& other) noexcept {
-  std::swap(segment_,         other.segment_);
-  std::swap(symbol_,          other.symbol_);
-  std::swap(library_ordinal_, other.library_ordinal_);
-  std::swap(addend_,          other.addend_);
-  std::swap(is_weak_import_,  other.is_weak_import_);
-  std::swap(library_,         other.library_);
-  std::swap(address_,         other.address_);
-}
+        void BindingInfo::swap(BindingInfo &other) noexcept {
+            std::swap(segment_, other.segment_);
+            std::swap(symbol_, other.symbol_);
+            std::swap(library_ordinal_, other.library_ordinal_);
+            std::swap(addend_, other.addend_);
+            std::swap(is_weak_import_, other.is_weak_import_);
+            std::swap(library_, other.library_);
+            std::swap(address_, other.address_);
+        }
 
-void BindingInfo::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void BindingInfo::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& operator<<(std::ostream& os, const BindingInfo& info) {
-  os << fmt::format("address=0x{:08x}, addend=0x{:x}",
-                    info.address(), info.addend());
-  if (const Symbol* sym = info.symbol()) {
-    os << fmt::format("  symbol={}", sym->name());
-  }
-  if (const SegmentCommand* seg = info.segment()) {
-    os << fmt::format("  segment={}", seg->name());
-  }
-  if (const DylibCommand* lib = info.library()) {
-    os << fmt::format("  library={}", lib->name());
-  }
-  return os;
-}
+        std::ostream &operator<<(std::ostream &os, const BindingInfo &info) {
+            os << fmt::format("address=0x{:08x}, addend=0x{:x}",
+                              info.address(), info.addend());
+            if (const Symbol *sym = info.symbol()) {
+                os << fmt::format("  symbol={}", sym->name());
+            }
+            if (const SegmentCommand *seg = info.segment()) {
+                os << fmt::format("  segment={}", seg->name());
+            }
+            if (const DylibCommand *lib = info.library()) {
+                os << fmt::format("  library={}", lib->name());
+            }
+            return os;
+        }
 
-}
+    }
 }

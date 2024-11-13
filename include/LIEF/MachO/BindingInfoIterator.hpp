@@ -15,95 +15,98 @@
  */
 #ifndef LIEF_MACHO_BINDING_INFO_IT_H
 #define LIEF_MACHO_BINDING_INFO_IT_H
+
 #include "LIEF/visibility.h"
 #include "LIEF/iterators.hpp"
 #include "LIEF/MachO/BindingInfo.hpp"
 
 namespace LIEF {
-namespace MachO {
-class Binary;
-class DyldInfo;
-class DyldChainedFixups;
+    namespace MachO {
+        class Binary;
 
-class LIEF_API BindingInfoIterator :
-    public iterator_facade_base<BindingInfoIterator,
-                                std::random_access_iterator_tag,
-                                const BindingInfo&,
-                                std::ptrdiff_t,
-                                const BindingInfo*,
-                                const BindingInfo&
-    >
-{
-  public:
-  enum class ORIGIN : uint8_t {
-    NONE = 0,
-    DYLD,
-    CHAINED_FIXUPS,
-    INDIRECT,
-  };
+        class DyldInfo;
 
-  BindingInfoIterator& operator=(const BindingInfoIterator&) = default;
-  BindingInfoIterator(const BindingInfoIterator&) = default;
+        class DyldChainedFixups;
 
-  BindingInfoIterator(BindingInfoIterator&&) = default;
-  BindingInfoIterator& operator=(BindingInfoIterator&&) = default;
-  ~BindingInfoIterator() = default;
+        class LIEF_API BindingInfoIterator :
+                public iterator_facade_base<BindingInfoIterator,
+                        std::random_access_iterator_tag,
+                        const BindingInfo &,
+                        std::ptrdiff_t,
+                        const BindingInfo *,
+                        const BindingInfo &
+                > {
+        public:
+            enum class ORIGIN : uint8_t {
+                NONE = 0,
+                DYLD,
+                CHAINED_FIXUPS,
+                INDIRECT,
+            };
 
-  BindingInfoIterator(const DyldInfo& dyld_info, size_t pos) :
-    pos_(pos),
-    origin_(ORIGIN::DYLD),
-    dyld_info_(&dyld_info)
-  {}
+            BindingInfoIterator &operator=(const BindingInfoIterator &) = default;
 
-  BindingInfoIterator(const DyldChainedFixups& fixups, size_t pos) :
-    pos_(pos),
-    origin_(ORIGIN::CHAINED_FIXUPS),
-    chained_fixups_(&fixups)
-  {}
+            BindingInfoIterator(const BindingInfoIterator &) = default;
 
-  BindingInfoIterator(const Binary& binary, size_t pos) :
-    pos_(pos),
-    origin_(ORIGIN::INDIRECT),
-    binary_(&binary)
-  {}
+            BindingInfoIterator(BindingInfoIterator &&) = default;
 
-  bool operator<(const BindingInfoIterator& rhs) const {
-    return pos_ < rhs.pos_;
-  }
+            BindingInfoIterator &operator=(BindingInfoIterator &&) = default;
 
-  std::ptrdiff_t operator-(const BindingInfoIterator& R) const {
-    return pos_ - R.pos_;
-  }
+            ~BindingInfoIterator() = default;
 
-  BindingInfoIterator& operator+=(std::ptrdiff_t n) {
-    pos_ += n;
-    return *this;
-  }
+            BindingInfoIterator(const DyldInfo &dyld_info, size_t pos) :
+                    pos_(pos),
+                    origin_(ORIGIN::DYLD),
+                    dyld_info_(&dyld_info) {}
 
-  BindingInfoIterator& operator-=(std::ptrdiff_t n) {
-    pos_ -= n;
-    return *this;
-  }
+            BindingInfoIterator(const DyldChainedFixups &fixups, size_t pos) :
+                    pos_(pos),
+                    origin_(ORIGIN::CHAINED_FIXUPS),
+                    chained_fixups_(&fixups) {}
 
-  friend bool operator==(const BindingInfoIterator& LHS, const BindingInfoIterator& RHS) {
-    return LHS.pos_ == RHS.pos_;
-  }
+            BindingInfoIterator(const Binary &binary, size_t pos) :
+                    pos_(pos),
+                    origin_(ORIGIN::INDIRECT),
+                    binary_(&binary) {}
 
-  const BindingInfo& operator*() const;
+            bool operator<(const BindingInfoIterator &rhs) const {
+                return pos_ < rhs.pos_;
+            }
 
-  private:
-  BindingInfoIterator() = default;
-  size_t pos_ = 0;
-  ORIGIN origin_ = ORIGIN::NONE;
-  union {
-    const DyldInfo* dyld_info_ = nullptr;
-    const DyldChainedFixups* chained_fixups_;
-    const Binary* binary_;
-  };
+            std::ptrdiff_t operator-(const BindingInfoIterator &R) const {
+                return pos_ - R.pos_;
+            }
 
-};
+            BindingInfoIterator &operator+=(std::ptrdiff_t n) {
+                pos_ += n;
+                return *this;
+            }
 
-}
+            BindingInfoIterator &operator-=(std::ptrdiff_t n) {
+                pos_ -= n;
+                return *this;
+            }
+
+            friend bool operator==(const BindingInfoIterator &LHS, const BindingInfoIterator &RHS) {
+                return LHS.pos_ == RHS.pos_;
+            }
+
+            const BindingInfo &operator*() const;
+
+        private:
+            BindingInfoIterator() = default;
+
+            size_t pos_ = 0;
+            ORIGIN origin_ = ORIGIN::NONE;
+            union {
+                const DyldInfo *dyld_info_ = nullptr;
+                const DyldChainedFixups *chained_fixups_;
+                const Binary *binary_;
+            };
+
+        };
+
+    }
 }
 #endif
 

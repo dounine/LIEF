@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_DYLD_INFO_BINDING_INFO_H
 #define LIEF_MACHO_DYLD_INFO_BINDING_INFO_H
+
 #include <ostream>
 #include <cstdint>
 
@@ -22,7 +23,7 @@
 #include "LIEF/MachO/BindingInfo.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
 /// This class represents a symbol binding operation associated with
 /// the LC_DYLD_INFO bytecode.
@@ -31,95 +32,99 @@ namespace MachO {
 /// specifications but it provides a *view* on an entry of the Dyld binding opcodes.
 ///
 /// @see: BindingInfo
-class LIEF_API DyldBindingInfo : public BindingInfo {
-  friend class BinaryParser;
+        class LIEF_API DyldBindingInfo : public BindingInfo {
+            friend class BinaryParser;
 
-  public:
-  enum class CLASS: uint64_t  {
-    WEAK     = 1u,
-    LAZY     = 2u,
-    STANDARD = 3u,
-    THREADED = 100u
-  };
+        public:
+            enum class CLASS : uint64_t {
+                WEAK = 1u,
+                LAZY = 2u,
+                STANDARD = 3u,
+                THREADED = 100u
+            };
 
-  enum class TYPE: uint64_t  {
-    POINTER         = 1u,
-    TEXT_ABSOLUTE32 = 2u,
-    TEXT_PCREL32    = 3u
-  };
+            enum class TYPE : uint64_t {
+                POINTER = 1u,
+                TEXT_ABSOLUTE32 = 2u,
+                TEXT_PCREL32 = 3u
+            };
 
-  public:
-  DyldBindingInfo() = default;
-  DyldBindingInfo(CLASS cls, TYPE type,
-                  uint64_t address, int64_t addend = 0,
-                  int32_t oridnal = 0, bool is_weak = false,
-                  bool is_non_weak_definition = false, uint64_t offset = 0);
+        public:
+            DyldBindingInfo() = default;
 
-  DyldBindingInfo& operator=(const DyldBindingInfo& other) = default;
-  DyldBindingInfo(const DyldBindingInfo& other) = default;
+            DyldBindingInfo(CLASS cls, TYPE type,
+                            uint64_t address, int64_t addend = 0,
+                            int32_t oridnal = 0, bool is_weak = false,
+                            bool is_non_weak_definition = false, uint64_t offset = 0);
 
-  DyldBindingInfo(DyldBindingInfo&&) noexcept = default;
+            DyldBindingInfo &operator=(const DyldBindingInfo &other) = default;
 
-  void swap(DyldBindingInfo& other) noexcept;
+            DyldBindingInfo(const DyldBindingInfo &other) = default;
 
-  /// Class of the binding (weak, lazy, ...)
-  CLASS binding_class() const {
-    return class_;
-  }
-  void binding_class(CLASS bind_class) {
-    class_ = bind_class;
-  }
+            DyldBindingInfo(DyldBindingInfo &&) noexcept = default;
 
-  /// Type of the binding. Most of the times it's TYPE::POINTER
-  TYPE binding_type() const {
-    return binding_type_;
-  }
+            void swap(DyldBindingInfo &other) noexcept;
 
-  void binding_type(TYPE type) {
-    binding_type_ = type;
-  }
+            /// Class of the binding (weak, lazy, ...)
+            CLASS binding_class() const {
+                return class_;
+            }
 
-  bool is_non_weak_definition() const {
-    return this->is_non_weak_definition_;
-  }
+            void binding_class(CLASS bind_class) {
+                class_ = bind_class;
+            }
 
-  void set_non_weak_definition(bool val) {
-    this->is_non_weak_definition_ = val;
-  }
+            /// Type of the binding. Most of the times it's TYPE::POINTER
+            TYPE binding_type() const {
+                return binding_type_;
+            }
 
-  /// Original relative offset of the binding opcodes
-  uint64_t original_offset() const {
-    return offset_;
-  }
+            void binding_type(TYPE type) {
+                binding_type_ = type;
+            }
 
-  BindingInfo::TYPES type() const override {
-    return BindingInfo::TYPES::DYLD_INFO;
-  }
+            bool is_non_weak_definition() const {
+                return this->is_non_weak_definition_;
+            }
 
-  static bool classof(const BindingInfo* info) {
-    return info->type() == BindingInfo::TYPES::DYLD_INFO;
-  }
+            void set_non_weak_definition(bool val) {
+                this->is_non_weak_definition_ = val;
+            }
 
-  ~DyldBindingInfo() override = default;
+            /// Original relative offset of the binding opcodes
+            uint64_t original_offset() const {
+                return offset_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            BindingInfo::TYPES type() const override {
+                return BindingInfo::TYPES::DYLD_INFO;
+            }
 
-  LIEF_API friend
-  std::ostream& operator<<(std::ostream& os, const DyldBindingInfo& info) {
-    os << static_cast<const BindingInfo&>(info);
-    return os;
-  }
+            static bool classof(const BindingInfo *info) {
+                return info->type() == BindingInfo::TYPES::DYLD_INFO;
+            }
 
-  private:
-  CLASS class_ = CLASS::STANDARD;
-  TYPE binding_type_ = TYPE::POINTER;
-  bool is_non_weak_definition_ = false;
-  uint64_t offset_ = 0;
-};
+            ~DyldBindingInfo() override = default;
 
-LIEF_API const char* to_string(DyldBindingInfo::CLASS e);
-LIEF_API const char* to_string(DyldBindingInfo::TYPE e);
+            void accept(Visitor &visitor) const override;
 
-}
+            LIEF_API friend
+            std::ostream &operator<<(std::ostream &os, const DyldBindingInfo &info) {
+                os << static_cast<const BindingInfo &>(info);
+                return os;
+            }
+
+        private:
+            CLASS class_ = CLASS::STANDARD;
+            TYPE binding_type_ = TYPE::POINTER;
+            bool is_non_weak_definition_ = false;
+            uint64_t offset_ = 0;
+        };
+
+        LIEF_API const char *to_string(DyldBindingInfo::CLASS e);
+
+        LIEF_API const char *to_string(DyldBindingInfo::TYPE e);
+
+    }
 }
 #endif

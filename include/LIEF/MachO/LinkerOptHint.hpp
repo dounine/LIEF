@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_LINKER_OPT_HINT_COMMAND_H
 #define LIEF_MACHO_LINKER_OPT_HINT_COMMAND_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -23,76 +24,82 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
-class Builder;
-class LinkEdit;
+        class BinaryParser;
 
-namespace details {
-struct linkedit_data_command;
-}
+        class Builder;
+
+        class LinkEdit;
+
+        namespace details {
+            struct linkedit_data_command;
+        }
 
 /// Class which represents the `LC_LINKER_OPTIMIZATION_HINT` command
-class LIEF_API LinkerOptHint : public LoadCommand {
-  friend class BinaryParser;
-  friend class Builder;
-  friend class LinkEdit;
+        class LIEF_API LinkerOptHint : public LoadCommand {
+            friend class BinaryParser;
 
-  public:
-  LinkerOptHint() = default;
-  LinkerOptHint(const details::linkedit_data_command& cmd);
+            friend class Builder;
 
-  LinkerOptHint& operator=(const LinkerOptHint& copy) = default;
-  LinkerOptHint(const LinkerOptHint& copy) = default;
+            friend class LinkEdit;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<LinkerOptHint>(new LinkerOptHint(*this));
-  }
+        public:
+            LinkerOptHint() = default;
 
-  /// Offset in the binary where the *hint* starts
-  uint32_t data_offset() const {
-    return data_offset_;
-  }
+            LinkerOptHint(const details::linkedit_data_command &cmd);
 
-  /// Size of the payload
-  uint32_t data_size() const {
-    return data_size_;
-  }
+            LinkerOptHint &operator=(const LinkerOptHint &copy) = default;
 
-  void data_offset(uint32_t offset) {
-    data_offset_ = offset;
-  }
+            LinkerOptHint(const LinkerOptHint &copy) = default;
 
-  void data_size(uint32_t size) {
-    data_size_ = size;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<LinkerOptHint>(new LinkerOptHint(*this));
+            }
 
-  span<const uint8_t> content() const {
-    return content_;
-  }
+            /// Offset in the binary where the *hint* starts
+            uint32_t data_offset() const {
+                return data_offset_;
+            }
 
-  span<uint8_t> content() {
-    return content_;
-  }
+            /// Size of the payload
+            uint32_t data_size() const {
+                return data_size_;
+            }
 
-  ~LinkerOptHint() override = default;
+            void data_offset(uint32_t offset) {
+                data_offset_ = offset;
+            }
 
-  void accept(Visitor& visitor) const override;
+            void data_size(uint32_t size) {
+                data_size_ = size;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            span<const uint8_t> content() const {
+                return content_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::LINKER_OPTIMIZATION_HINT;
-  }
+            span<uint8_t> content() {
+                return content_;
+            }
 
-  private:
-  uint32_t      data_offset_ = 0;
-  uint32_t      data_size_   = 0;
-  span<uint8_t> content_;
+            ~LinkerOptHint() override = default;
 
-};
+            void accept(Visitor &visitor) const override;
 
-}
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::LINKER_OPTIMIZATION_HINT;
+            }
+
+        private:
+            uint32_t data_offset_ = 0;
+            uint32_t data_size_ = 0;
+            span<uint8_t> content_;
+
+        };
+
+    }
 }
 #endif

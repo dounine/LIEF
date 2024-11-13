@@ -20,40 +20,38 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-FilesetCommand::FilesetCommand(const details::fileset_entry_command& cmd) :
-  LoadCommand{LoadCommand::TYPE::FILESET_ENTRY, cmd.cmdsize},
-  virtual_address_{cmd.vmaddr},
-  file_offset_{cmd.fileoff}
-{}
+        FilesetCommand::FilesetCommand(const details::fileset_entry_command &cmd) :
+                LoadCommand{LoadCommand::TYPE::FILESET_ENTRY, cmd.cmdsize},
+                virtual_address_{cmd.vmaddr},
+                file_offset_{cmd.fileoff} {}
 
-FilesetCommand& FilesetCommand::operator=(FilesetCommand other) {
-  swap(other);
-  return *this;
-}
+        FilesetCommand &FilesetCommand::operator=(FilesetCommand other) {
+            swap(other);
+            return *this;
+        }
 
-FilesetCommand::FilesetCommand(const FilesetCommand& other) :
-  LoadCommand{other},
-  name_{other.name_},
-  virtual_address_{other.virtual_address_},
-  file_offset_{other.file_offset_}
-{}
+        FilesetCommand::FilesetCommand(const FilesetCommand &other) :
+                LoadCommand{other},
+                name_{other.name_},
+                virtual_address_{other.virtual_address_},
+                file_offset_{other.file_offset_} {}
 
-void FilesetCommand::swap(FilesetCommand& other) noexcept {
-  LoadCommand::swap(other);
+        void FilesetCommand::swap(FilesetCommand &other) noexcept {
+            LoadCommand::swap(other);
 
-  std::swap(virtual_address_, other.virtual_address_);
-  std::swap(file_offset_,     other.file_offset_);
-}
+            std::swap(virtual_address_, other.virtual_address_);
+            std::swap(file_offset_, other.file_offset_);
+        }
 
-std::ostream& FilesetCommand::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << fmt::format("name={}, va=0x{:06x}, offset=0x{:x}",
-                    name(), virtual_address(), file_offset());
-  return os;
-}
+        std::ostream &FilesetCommand::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << fmt::format("name={}, va=0x{:06x}, offset=0x{:x}",
+                              name(), virtual_address(), file_offset());
+            return os;
+        }
 
 
-}
+    }
 }

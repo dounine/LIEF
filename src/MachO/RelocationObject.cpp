@@ -21,79 +21,84 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-RelocationObject::RelocationObject(const details::relocation_info& relocinfo) :
-  is_pcrel_{static_cast<bool>(relocinfo.r_pcrel)}
-{
-  address_ = static_cast<uint32_t>(relocinfo.r_address);
-  size_    = static_cast<uint8_t>(relocinfo.r_length);
-  type_    = static_cast<uint8_t>(relocinfo.r_type);
-}
+        RelocationObject::RelocationObject(const details::relocation_info &relocinfo) :
+                is_pcrel_{static_cast<bool>(relocinfo.r_pcrel)} {
+            address_ = static_cast<uint32_t>(relocinfo.r_address);
+            size_ = static_cast<uint8_t>(relocinfo.r_length);
+            type_ = static_cast<uint8_t>(relocinfo.r_type);
+        }
 
-RelocationObject::RelocationObject(const details::scattered_relocation_info& scattered_relocinfo) :
-  is_pcrel_{static_cast<bool>(scattered_relocinfo.r_pcrel)},
-  is_scattered_{true},
-  value_{scattered_relocinfo.r_value}
-{
-  address_ = scattered_relocinfo.r_address;
-  size_    = static_cast<uint8_t>(scattered_relocinfo.r_length);
-  type_    = static_cast<uint8_t>(scattered_relocinfo.r_type);
-}
+        RelocationObject::RelocationObject(const details::scattered_relocation_info &scattered_relocinfo) :
+                is_pcrel_{static_cast<bool>(scattered_relocinfo.r_pcrel)},
+                is_scattered_{true},
+                value_{scattered_relocinfo.r_value} {
+            address_ = scattered_relocinfo.r_address;
+            size_ = static_cast<uint8_t>(scattered_relocinfo.r_length);
+            type_ = static_cast<uint8_t>(scattered_relocinfo.r_type);
+        }
 
-void RelocationObject::swap(RelocationObject& other) noexcept {
-  Relocation::swap(other);
+        void RelocationObject::swap(RelocationObject &other) noexcept {
+            Relocation::swap(other);
 
-  std::swap(is_pcrel_,     other.is_pcrel_);
-  std::swap(is_scattered_, other.is_scattered_);
-  std::swap(value_,        other.value_);
-}
+            std::swap(is_pcrel_, other.is_pcrel_);
+            std::swap(is_scattered_, other.is_scattered_);
+            std::swap(value_, other.value_);
+        }
 
-size_t RelocationObject::size() const {
-  if (size_ < 2) {
-    return ((size_t)size_ + 1) * 8;
-  }
-  return sizeof(uint32_t) * 8;
-}
+        size_t RelocationObject::size() const {
+            if (size_ < 2) {
+                return ((size_t) size_ + 1) * 8;
+            }
+            return sizeof(uint32_t) * 8;
+        }
 
 
-uint64_t RelocationObject::address() const {
-  const Section* sec = section();
-  if (sec == nullptr) {
-    return Relocation::address();
-  }
+        uint64_t RelocationObject::address() const {
+            const Section *sec = section();
+            if (sec == nullptr) {
+                return Relocation::address();
+            }
 
-  return address_ + section()->offset();
-}
+            return address_ + section()->offset();
+        }
 
-int32_t RelocationObject::value() const {
-  if (!is_scattered()) {
-    LIEF_ERR("This relocation is not a 'scattered' one");
-    return -1;
-  }
-  return value_;
-}
+        int32_t RelocationObject::value() const {
+            if (!is_scattered()) {
+                LIEF_ERR("This relocation is not a 'scattered' one");
+                return -1;
+            }
+            return value_;
+        }
 
-void RelocationObject::size(size_t size) {
-  switch(size) {
-    case 8:  size_ = 0; break;
-    case 16: size_ = 1; break;
-    case 32: size_ = 2; break;
-    default: LIEF_ERR("Size must not be bigger than 32 bits");
-  }
-}
+        void RelocationObject::size(size_t size) {
+            switch (size) {
+                case 8:
+                    size_ = 0;
+                    break;
+                case 16:
+                    size_ = 1;
+                    break;
+                case 32:
+                    size_ = 2;
+                    break;
+                default:
+                    LIEF_ERR("Size must not be bigger than 32 bits");
+            }
+        }
 
-void RelocationObject::value(int32_t value) {
-  if (!is_scattered()) {
-    LIEF_ERR("This relocation is not a 'scattered' one");
-    return;
-  }
-  value_ = value;
-}
+        void RelocationObject::value(int32_t value) {
+            if (!is_scattered()) {
+                LIEF_ERR("This relocation is not a 'scattered' one");
+                return;
+            }
+            value_ = value;
+        }
 
-void RelocationObject::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void RelocationObject::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-}
+    }
 }

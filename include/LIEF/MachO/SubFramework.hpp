@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_SUB_FRAMEWORK_H
 #define LIEF_MACHO_SUB_FRAMEWORK_H
+
 #include <string>
 #include <ostream>
 
@@ -23,13 +24,13 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
+        class BinaryParser;
 
-namespace details {
-struct sub_framework_command;
-}
+        namespace details {
+            struct sub_framework_command;
+        }
 
 /// Class that represents the SubFramework command.
 /// Accodring to the Mach-O ``loader.h`` documentation:
@@ -43,41 +44,45 @@ struct sub_framework_command;
 /// > editor produces an error and states to link against the umbrella framework.
 /// > The name of the umbrella framework for subframeworks is recorded in the
 /// > following structure.
-class LIEF_API SubFramework : public LoadCommand {
-  friend class BinaryParser;
-  public:
-  SubFramework() = default;
-  SubFramework(const details::sub_framework_command& cmd);
+        class LIEF_API SubFramework : public LoadCommand {
+            friend class BinaryParser;
 
-  SubFramework& operator=(const SubFramework& copy) = default;
-  SubFramework(const SubFramework& copy) = default;
+        public:
+            SubFramework() = default;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<SubFramework>(new SubFramework(*this));
-  }
+            SubFramework(const details::sub_framework_command &cmd);
 
-  /// Name of the umbrella framework
-  const std::string& umbrella() const {
-    return umbrella_;
-  }
-  void umbrella(std::string u) {
-    umbrella_ = std::move(u);
-  }
+            SubFramework &operator=(const SubFramework &copy) = default;
 
-  ~SubFramework() override = default;
+            SubFramework(const SubFramework &copy) = default;
 
-  void accept(Visitor& visitor) const override;
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<SubFramework>(new SubFramework(*this));
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            /// Name of the umbrella framework
+            const std::string &umbrella() const {
+                return umbrella_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::SUB_FRAMEWORK;
-  }
+            void umbrella(std::string u) {
+                umbrella_ = std::move(u);
+            }
 
-  private:
-  std::string umbrella_;
-};
+            ~SubFramework() override = default;
 
-}
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::SUB_FRAMEWORK;
+            }
+
+        private:
+            std::string umbrella_;
+        };
+
+    }
 }
 #endif

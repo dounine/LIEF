@@ -18,21 +18,20 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-DyldEnvironment::DyldEnvironment(const details::dylinker_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize}
-{}
+        DyldEnvironment::DyldEnvironment(const details::dylinker_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize} {}
 
-void DyldEnvironment::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void DyldEnvironment::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& DyldEnvironment::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << value();
-  return os;
-}
+        std::ostream &DyldEnvironment::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << value();
+            return os;
+        }
 
-}
+    }
 }

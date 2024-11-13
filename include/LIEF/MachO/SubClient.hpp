@@ -14,6 +14,7 @@
  */
 #ifndef LIEF_MACHO_SUB_CLIENT_H
 #define LIEF_MACHO_SUB_CLIENT_H
+
 #include <string>
 #include <ostream>
 
@@ -22,13 +23,13 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
+        class BinaryParser;
 
-namespace details {
-struct sub_client_command;
-}
+        namespace details {
+            struct sub_client_command;
+        }
 
 /// Class that represents the SubClient command.
 /// Accodring to the Mach-O `loader.h` documentation:
@@ -40,42 +41,45 @@ struct sub_client_command;
 /// > command is created for each -allowable_client flag.  The client_name is
 /// > usually a framework name.  It can also be a name used for bundles clients
 /// > where the bundle is built with "-client_name client_name".
-class LIEF_API SubClient : public LoadCommand {
-  friend class BinaryParser;
-  public:
-  SubClient() = default;
-  SubClient(const details::sub_client_command& cmd);
+        class LIEF_API SubClient : public LoadCommand {
+            friend class BinaryParser;
 
-  SubClient& operator=(const SubClient& copy) = default;
-  SubClient(const SubClient& copy) = default;
+        public:
+            SubClient() = default;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<SubClient>(new SubClient(*this));
-  }
+            SubClient(const details::sub_client_command &cmd);
 
-  /// Name of the client
-  const std::string& client() const {
-    return client_;
-  }
+            SubClient &operator=(const SubClient &copy) = default;
 
-  void client(std::string u) {
-    client_ = std::move(u);
-  }
+            SubClient(const SubClient &copy) = default;
 
-  ~SubClient() override = default;
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<SubClient>(new SubClient(*this));
+            }
 
-  void accept(Visitor& visitor) const override;
+            /// Name of the client
+            const std::string &client() const {
+                return client_;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            void client(std::string u) {
+                client_ = std::move(u);
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::SUB_CLIENT;
-  }
+            ~SubClient() override = default;
 
-  private:
-  std::string client_;
-};
+            void accept(Visitor &visitor) const override;
 
-}
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::SUB_CLIENT;
+            }
+
+        private:
+            std::string client_;
+        };
+
+    }
 }
 #endif

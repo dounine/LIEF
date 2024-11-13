@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_EXPORT_INFO_COMMAND_H
 #define LIEF_MACHO_EXPORT_INFO_COMMAND_H
+
 #include <vector>
 #include <ostream>
 #include <cstdint>
@@ -24,139 +25,150 @@
 #include "LIEF/Object.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
-class Symbol;
-class DylibCommand;
-class Binary;
+        class BinaryParser;
+
+        class Symbol;
+
+        class DylibCommand;
+
+        class Binary;
 
 /// Class that provides an interface over the Dyld export info
 ///
 /// This class does not represent a structure that exists in the Mach-O format
 /// specification but provides a *view* on an entry of the Dyld export trie.
-class LIEF_API ExportInfo : public Object {
+        class LIEF_API ExportInfo : public Object {
 
-  friend class BinaryParser;
-  friend class Binary;
+            friend class BinaryParser;
 
-  public:
-  enum class KIND: uint64_t  {
-    REGULAR           = 0x00u,
-    THREAD_LOCAL_KIND = 0x01u,
-    ABSOLUTE_KIND     = 0x02u
-  };
+            friend class Binary;
 
-  enum class FLAGS: uint64_t  {
-    WEAK_DEFINITION     = 0x04u,
-    REEXPORT            = 0x08u,
-    STUB_AND_RESOLVER   = 0x10u
-  };
+        public:
+            enum class KIND : uint64_t {
+                REGULAR = 0x00u,
+                THREAD_LOCAL_KIND = 0x01u,
+                ABSOLUTE_KIND = 0x02u
+            };
 
-  using flag_list_t = std::vector<FLAGS>;
+            enum class FLAGS : uint64_t {
+                WEAK_DEFINITION = 0x04u,
+                REEXPORT = 0x08u,
+                STUB_AND_RESOLVER = 0x10u
+            };
 
-  ExportInfo() = default;
-  ExportInfo(uint64_t address, uint64_t flags, uint64_t offset = 0) :
-    node_offset_(offset),
-    flags_(flags),
-    address_(address)
-  {}
+            using flag_list_t = std::vector<FLAGS>;
 
-  ExportInfo& operator=(ExportInfo copy);
-  ExportInfo(const ExportInfo& copy);
-  void swap(ExportInfo& other) noexcept;
+            ExportInfo() = default;
 
-  /// Original offset in the export Trie
-  uint64_t node_offset() const {
-    return node_offset_;
-  }
+            ExportInfo(uint64_t address, uint64_t flags, uint64_t offset = 0) :
+                    node_offset_(offset),
+                    flags_(flags),
+                    address_(address) {}
 
-  /// Some information (ExportInfo::FLAGS) about the export.
-  /// (like weak export, reexport, ...)
-  uint64_t flags() const {
-    return flags_;
-  }
+            ExportInfo &operator=(ExportInfo copy);
 
-  void flags(uint64_t flags) {
-    flags_ = flags;
-  }
+            ExportInfo(const ExportInfo &copy);
 
-  /// The export flags() as a list
-  flag_list_t flags_list() const;
+            void swap(ExportInfo &other) noexcept;
 
-  /// Check if the current entry contains the provided ExportInfo::FLAGS
-  bool has(FLAGS flag) const;
+            /// Original offset in the export Trie
+            uint64_t node_offset() const {
+                return node_offset_;
+            }
 
-  /// The export's kind (regular, thread local, absolute, ...)
-  KIND kind() const {
-    static constexpr auto MASK = uint64_t(3);
-    return KIND(flags_ & MASK);
-  }
+            /// Some information (ExportInfo::FLAGS) about the export.
+            /// (like weak export, reexport, ...)
+            uint64_t flags() const {
+                return flags_;
+            }
 
-  uint64_t other() const {
-    return other_;
-  }
+            void flags(uint64_t flags) {
+                flags_ = flags;
+            }
 
-  /// The address of the export
-  uint64_t address() const {
-    return address_;
-  }
-  void address(uint64_t addr) {
-    address_ = addr;
-  }
+            /// The export flags() as a list
+            flag_list_t flags_list() const;
 
-  /// Check if a symbol is associated with this export
-  bool has_symbol() const {
-    return symbol() != nullptr;
-  }
+            /// Check if the current entry contains the provided ExportInfo::FLAGS
+            bool has(FLAGS flag) const;
 
-  /// MachO::Symbol associated with this export or a nullptr if no symbol
-  const Symbol* symbol() const {
-    return symbol_;
-  }
-  Symbol* symbol() {
-    return symbol_;
-  }
+            /// The export's kind (regular, thread local, absolute, ...)
+            KIND kind() const {
+                static constexpr auto MASK = uint64_t(3);
+                return KIND(flags_ & MASK);
+            }
 
-  /// If the export is a ExportInfo::FLAGS::REEXPORT,
-  /// this returns the (optional) MachO::Symbol
-  Symbol* alias() {
-    return alias_;
-  }
-  const Symbol* alias() const {
-    return alias_;
-  }
+            uint64_t other() const {
+                return other_;
+            }
 
-  /// If the export is a ExportInfo::FLAGS::REEXPORT,
-  /// this returns the (optional) library (MachO::DylibCommand)
-  DylibCommand* alias_library() {
-    return alias_location_;
-  }
-  const DylibCommand* alias_library() const {
-    return alias_location_;
-  }
+            /// The address of the export
+            uint64_t address() const {
+                return address_;
+            }
 
-  ~ExportInfo() override = default;
+            void address(uint64_t addr) {
+                address_ = addr;
+            }
 
-  void accept(Visitor& visitor) const override;
+            /// Check if a symbol is associated with this export
+            bool has_symbol() const {
+                return symbol() != nullptr;
+            }
 
-  LIEF_API friend std::ostream& operator<<(std::ostream& os, const ExportInfo& export_info);
+            /// MachO::Symbol associated with this export or a nullptr if no symbol
+            const Symbol *symbol() const {
+                return symbol_;
+            }
 
-  private:
-  uint64_t node_offset_ = 0;
-  uint64_t flags_ = 0;
-  uint64_t address_ = 0;
-  uint64_t other_ = 0;
-  Symbol* symbol_ = nullptr;
+            Symbol *symbol() {
+                return symbol_;
+            }
 
-  Symbol* alias_ = nullptr;
-  DylibCommand* alias_location_ = nullptr;
-};
+            /// If the export is a ExportInfo::FLAGS::REEXPORT,
+            /// this returns the (optional) MachO::Symbol
+            Symbol *alias() {
+                return alias_;
+            }
 
-LIEF_API const char* to_string(ExportInfo::KIND kind);
-LIEF_API const char* to_string(ExportInfo::FLAGS flags);
+            const Symbol *alias() const {
+                return alias_;
+            }
 
-}
+            /// If the export is a ExportInfo::FLAGS::REEXPORT,
+            /// this returns the (optional) library (MachO::DylibCommand)
+            DylibCommand *alias_library() {
+                return alias_location_;
+            }
+
+            const DylibCommand *alias_library() const {
+                return alias_location_;
+            }
+
+            ~ExportInfo() override = default;
+
+            void accept(Visitor &visitor) const override;
+
+            LIEF_API friend std::ostream &operator<<(std::ostream &os, const ExportInfo &export_info);
+
+        private:
+            uint64_t node_offset_ = 0;
+            uint64_t flags_ = 0;
+            uint64_t address_ = 0;
+            uint64_t other_ = 0;
+            Symbol *symbol_ = nullptr;
+
+            Symbol *alias_ = nullptr;
+            DylibCommand *alias_location_ = nullptr;
+        };
+
+        LIEF_API const char *to_string(ExportInfo::KIND kind);
+
+        LIEF_API const char *to_string(ExportInfo::FLAGS flags);
+
+    }
 }
 
 ENABLE_BITMASK_OPERATORS(LIEF::MachO::ExportInfo::FLAGS);

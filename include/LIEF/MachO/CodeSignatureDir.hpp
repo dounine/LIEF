@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_CODE_SIGNATURE_DIR_COMMAND_H
 #define LIEF_MACHO_CODE_SIGNATURE_DIR_COMMAND_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -23,75 +24,81 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
-class Builder;
-class LinkEdit;
+        class BinaryParser;
 
-namespace details {
-struct linkedit_data_command;
-}
+        class Builder;
 
-class LIEF_API CodeSignatureDir : public LoadCommand {
-  friend class BinaryParser;
-  friend class Builder;
-  friend class LinkEdit;
+        class LinkEdit;
 
-  public:
-  CodeSignatureDir() = default;
-  CodeSignatureDir(const details::linkedit_data_command& cmd);
+        namespace details {
+            struct linkedit_data_command;
+        }
 
-  CodeSignatureDir& operator=(const CodeSignatureDir& copy) = default;
-  CodeSignatureDir(const CodeSignatureDir& copy) = default;
+        class LIEF_API CodeSignatureDir : public LoadCommand {
+            friend class BinaryParser;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<CodeSignatureDir>(new CodeSignatureDir(*this));
-  }
+            friend class Builder;
 
-  /// Offset in the binary where the signature starts
-  uint32_t data_offset() const {
-    return data_offset_;
-  }
+            friend class LinkEdit;
 
-  /// Size of the raw signature
-  uint32_t data_size() const {
-    return data_size_;
-  }
+        public:
+            CodeSignatureDir() = default;
 
-  void data_offset(uint32_t offset) {
-    data_offset_ = offset;
-  }
+            CodeSignatureDir(const details::linkedit_data_command &cmd);
 
-  void data_size(uint32_t size) {
-    data_size_ = size;
-  }
+            CodeSignatureDir &operator=(const CodeSignatureDir &copy) = default;
 
-  span<const uint8_t> content() const {
-    return content_;
-  }
+            CodeSignatureDir(const CodeSignatureDir &copy) = default;
 
-  span<uint8_t> content() {
-    return content_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<CodeSignatureDir>(new CodeSignatureDir(*this));
+            }
 
-  ~CodeSignatureDir() override = default;
+            /// Offset in the binary where the signature starts
+            uint32_t data_offset() const {
+                return data_offset_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            /// Size of the raw signature
+            uint32_t data_size() const {
+                return data_size_;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            void data_offset(uint32_t offset) {
+                data_offset_ = offset;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::DYLIB_CODE_SIGN_DRS;
-  }
+            void data_size(uint32_t size) {
+                data_size_ = size;
+            }
 
-  private:
-  uint32_t      data_offset_ = 0;
-  uint32_t      data_size_   = 0;
-  span<uint8_t> content_;
+            span<const uint8_t> content() const {
+                return content_;
+            }
 
-};
+            span<uint8_t> content() {
+                return content_;
+            }
 
-}
+            ~CodeSignatureDir() override = default;
+
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::DYLIB_CODE_SIGN_DRS;
+            }
+
+        private:
+            uint32_t data_offset_ = 0;
+            uint32_t data_size_ = 0;
+            span<uint8_t> content_;
+
+        };
+
+    }
 }
 #endif

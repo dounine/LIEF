@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_TWO_LEVEL_HINTS_H
 #define LIEF_MACHO_TWO_LEVEL_HINTS_H
+
 #include <vector>
 #include <ostream>
 
@@ -25,71 +26,80 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
-class Builder;
-class LinkEdit;
+        class BinaryParser;
 
-namespace details {
-struct twolevel_hints_command;
-}
+        class Builder;
+
+        class LinkEdit;
+
+        namespace details {
+            struct twolevel_hints_command;
+        }
 
 /// Class which represents the `LC_TWOLEVEL_HINTS` command
-class LIEF_API TwoLevelHints : public LoadCommand {
-  friend class BinaryParser;
-  friend class LinkEdit;
-  friend class Builder;
+        class LIEF_API TwoLevelHints : public LoadCommand {
+            friend class BinaryParser;
 
-  public:
-  using hints_list_t     = std::vector<uint32_t>;
-  using it_hints_t       = ref_iterator<hints_list_t&>;
-  using it_const_hints_t = const_ref_iterator<const hints_list_t&>;
+            friend class LinkEdit;
 
-  TwoLevelHints() = default;
-  TwoLevelHints(const details::twolevel_hints_command& cmd);
+            friend class Builder;
 
-  TwoLevelHints& operator=(const TwoLevelHints& copy) = default;
-  TwoLevelHints(const TwoLevelHints& copy) = default;
+        public:
+            using hints_list_t = std::vector<uint32_t>;
+            using it_hints_t = ref_iterator<hints_list_t &>;
+            using it_const_hints_t = const_ref_iterator<const hints_list_t &>;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<TwoLevelHints>(new TwoLevelHints(*this));
-  }
+            TwoLevelHints() = default;
 
-  /// Original payload of the command
-  span<const uint8_t> content() const { return content_; }
-  span<uint8_t> content() { return content_; }
+            TwoLevelHints(const details::twolevel_hints_command &cmd);
 
-  /// Iterator over the hints (`uint32_t` integers)
-  it_hints_t hints() { return hints_; }
-  it_const_hints_t hints() const { return hints_; }
+            TwoLevelHints &operator=(const TwoLevelHints &copy) = default;
 
-  /// Original offset of the command. It should point in the
-  /// `__LINKEDIT` segment
-  uint32_t offset() const { return offset_; }
-  void offset(uint32_t offset)  { offset_ = offset; }
+            TwoLevelHints(const TwoLevelHints &copy) = default;
 
-  uint32_t original_nb_hints() const {
-    return original_nb_hints_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<TwoLevelHints>(new TwoLevelHints(*this));
+            }
 
-  ~TwoLevelHints() override = default;
+            /// Original payload of the command
+            span<const uint8_t> content() const { return content_; }
 
-  void accept(Visitor& visitor) const override;
+            span<uint8_t> content() { return content_; }
 
-  std::ostream& print(std::ostream& os) const override;
+            /// Iterator over the hints (`uint32_t` integers)
+            it_hints_t hints() { return hints_; }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::TWOLEVEL_HINTS;
-  }
+            it_const_hints_t hints() const { return hints_; }
 
-  private:
-  uint32_t offset_ = 0;
-  hints_list_t hints_;
-  span<uint8_t> content_;
-  uint32_t original_nb_hints_ = 0;
-};
+            /// Original offset of the command. It should point in the
+            /// `__LINKEDIT` segment
+            uint32_t offset() const { return offset_; }
 
-}
+            void offset(uint32_t offset) { offset_ = offset; }
+
+            uint32_t original_nb_hints() const {
+                return original_nb_hints_;
+            }
+
+            ~TwoLevelHints() override = default;
+
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::TWOLEVEL_HINTS;
+            }
+
+        private:
+            uint32_t offset_ = 0;
+            hints_list_t hints_;
+            span<uint8_t> content_;
+            uint32_t original_nb_hints_ = 0;
+        };
+
+    }
 }
 #endif

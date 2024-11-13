@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_ROUTINE_H
 #define LIEF_MACHO_ROUTINE_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -22,9 +23,9 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
+        class BinaryParser;
 
 /// Class that represents the `LC_ROUTINE/LC_ROUTINE64` commands.
 /// Accodring to the Mach-O `loader.h` documentation:
@@ -35,108 +36,111 @@ class BinaryParser;
 /// > dynamic linker fully binds the module that defines the initialization routine
 /// > and then calls it.  This gets called before any module initialization
 /// > routines (used for C++ static constructors) in the library.
-class LIEF_API Routine : public LoadCommand {
-  friend class BinaryParser;
-  public:
-  Routine() = default;
+        class LIEF_API Routine : public LoadCommand {
+            friend class BinaryParser;
 
-  template<class T>
-  LIEF_LOCAL Routine(const T& cmd);
+        public:
+            Routine() = default;
 
-  Routine& operator=(const Routine& copy) = default;
-  Routine(const Routine& copy) = default;
+            template<class T>
+            LIEF_LOCAL Routine(const T &cmd);
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<Routine>(new Routine(*this));
-  }
+            Routine &operator=(const Routine &copy) = default;
 
-  /// address of initialization routine
-  uint64_t init_address() const {
-    return init_address_;
-  }
+            Routine(const Routine &copy) = default;
 
-  void init_address(uint64_t addr) {
-    init_address_ = addr;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<Routine>(new Routine(*this));
+            }
 
-  /// Index into the module table that the init routine is defined in
-  uint64_t init_module() const {
-    return init_module_;
-  }
+            /// address of initialization routine
+            uint64_t init_address() const {
+                return init_address_;
+            }
 
-  void init_module(uint64_t mod) {
-    init_module_ = mod;
-  }
+            void init_address(uint64_t addr) {
+                init_address_ = addr;
+            }
 
-  uint64_t reserved1() const {
-    return reserved1_;
-  }
+            /// Index into the module table that the init routine is defined in
+            uint64_t init_module() const {
+                return init_module_;
+            }
 
-  void reserved1(uint64_t value) {
-    reserved1_ = value;
-  }
+            void init_module(uint64_t mod) {
+                init_module_ = mod;
+            }
 
-  uint64_t reserved2() const {
-    return reserved2_;
-  }
+            uint64_t reserved1() const {
+                return reserved1_;
+            }
 
-  void reserved2(uint64_t value) {
-    reserved2_ = value;
-  }
+            void reserved1(uint64_t value) {
+                reserved1_ = value;
+            }
 
-  uint64_t reserved3() const {
-    return reserved3_;
-  }
+            uint64_t reserved2() const {
+                return reserved2_;
+            }
 
-  void reserved3(uint64_t value) {
-    reserved3_ = value;
-  }
+            void reserved2(uint64_t value) {
+                reserved2_ = value;
+            }
 
-  uint64_t reserved4() const {
-    return reserved4_;
-  }
+            uint64_t reserved3() const {
+                return reserved3_;
+            }
 
-  void reserved4(uint64_t value) {
-    reserved4_ = value;
-  }
+            void reserved3(uint64_t value) {
+                reserved3_ = value;
+            }
 
-  uint64_t reserved5() const {
-    return reserved5_;
-  }
+            uint64_t reserved4() const {
+                return reserved4_;
+            }
 
-  void reserved5(uint64_t value) {
-    reserved5_ = value;
-  }
+            void reserved4(uint64_t value) {
+                reserved4_ = value;
+            }
 
-  uint64_t reserved6() const {
-    return reserved6_;
-  }
+            uint64_t reserved5() const {
+                return reserved5_;
+            }
 
-  void reserved6(uint64_t value) {
-    reserved6_ = value;
-  }
+            void reserved5(uint64_t value) {
+                reserved5_ = value;
+            }
 
-  ~Routine() override = default;
+            uint64_t reserved6() const {
+                return reserved6_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            void reserved6(uint64_t value) {
+                reserved6_ = value;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            ~Routine() override = default;
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::ROUTINES ||
-           cmd->command() == LoadCommand::TYPE::ROUTINES_64;
-  }
-  private:
-  uint64_t init_address_ = 0;
-  uint64_t init_module_ = 0;
-  uint64_t reserved1_ = 0;
-  uint64_t reserved2_ = 0;
-  uint64_t reserved3_ = 0;
-  uint64_t reserved4_ = 0;
-  uint64_t reserved5_ = 0;
-  uint64_t reserved6_ = 0;
-};
+            void accept(Visitor &visitor) const override;
 
-}
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::ROUTINES ||
+                       cmd->command() == LoadCommand::TYPE::ROUTINES_64;
+            }
+
+        private:
+            uint64_t init_address_ = 0;
+            uint64_t init_module_ = 0;
+            uint64_t reserved1_ = 0;
+            uint64_t reserved2_ = 0;
+            uint64_t reserved3_ = 0;
+            uint64_t reserved4_ = 0;
+            uint64_t reserved5_ = 0;
+            uint64_t reserved6_ = 0;
+        };
+
+    }
 }
 #endif

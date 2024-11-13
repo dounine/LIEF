@@ -18,24 +18,23 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-EncryptionInfo::EncryptionInfo(const details::encryption_info_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
-  coff_{cmd.cryptoff},
-  csize_{cmd.cryptsize},
-  cid_{cmd.cryptid}
-{}
+        EncryptionInfo::EncryptionInfo(const details::encryption_info_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
+                coff_{cmd.cryptoff},
+                csize_{cmd.cryptsize},
+                cid_{cmd.cryptid} {}
 
-void EncryptionInfo::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void EncryptionInfo::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& EncryptionInfo::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  return os;
-}
+        std::ostream &EncryptionInfo::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            return os;
+        }
 
 
-}
+    }
 }

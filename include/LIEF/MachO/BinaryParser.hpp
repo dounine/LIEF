@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_BINARY_PARSER_H
 #define LIEF_MACHO_BINARY_PARSER_H
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -34,248 +35,272 @@
 #include "LIEF/MachO/DyldBindingInfo.hpp"
 
 namespace LIEF {
-class BinaryStream;
-class SpanStream;
+    class BinaryStream;
 
-namespace MachO {
-class ChainedBindingInfo;
-class CodeSignature;
-class CodeSignatureDir;
-class DataInCode;
-class DyldChainedFixups;
-class DylibCommand;
-class DynamicSymbolCommand;
-class ExportInfo;
-class FunctionStarts;
-class LinkerOptHint;
-class Parser;
-class Section;
-class SegmentCommand;
-class SegmentSplitInfo;
-class Symbol;
-class SymbolCommand;
-class TwoLevelHints;
-struct ParserConfig;
+    class SpanStream;
+
+    namespace MachO {
+        class ChainedBindingInfo;
+
+        class CodeSignature;
+
+        class CodeSignatureDir;
+
+        class DataInCode;
+
+        class DyldChainedFixups;
+
+        class DylibCommand;
+
+        class DynamicSymbolCommand;
+
+        class ExportInfo;
+
+        class FunctionStarts;
+
+        class LinkerOptHint;
+
+        class Parser;
+
+        class Section;
+
+        class SegmentCommand;
+
+        class SegmentSplitInfo;
+
+        class Symbol;
+
+        class SymbolCommand;
+
+        class TwoLevelHints;
+
+        struct ParserConfig;
 
 
-namespace details {
-struct dyld_chained_starts_in_segment;
-struct dyld_chained_fixups_header;
-union dyld_chained_ptr_arm64e;
-union dyld_chained_ptr_generic64;
-union dyld_chained_ptr_generic32;
-}
+        namespace details {
+            struct dyld_chained_starts_in_segment;
+            struct dyld_chained_fixups_header;
+            union dyld_chained_ptr_arm64e;
+            union dyld_chained_ptr_generic64;
+            union dyld_chained_ptr_generic32;
+        }
 
 /// Class used to parse a **single** binary (i.e. non-FAT)
 ///
 /// @warning This class should not be directly used.
 ///
 /// @see MachO::Parser
-class LIEF_API BinaryParser : public LIEF::Parser {
+        class LIEF_API BinaryParser : public LIEF::Parser {
 
-  friend class MachO::Parser;
+            friend class MachO::Parser;
 
-  /// Maximum number of relocations
-  constexpr static size_t MAX_RELOCATIONS = (std::numeric_limits<uint16_t>::max)();
+            /// Maximum number of relocations
+            constexpr static size_t MAX_RELOCATIONS = (std::numeric_limits<uint16_t>::max)();
 
-  /// Maximum number of MachO LoadCommand
-  constexpr static size_t MAX_COMMANDS = (std::numeric_limits<uint16_t>::max)();
+            /// Maximum number of MachO LoadCommand
+            constexpr static size_t MAX_COMMANDS = (std::numeric_limits<uint16_t>::max)();
 
-  public:
-  static std::unique_ptr<Binary> parse(const std::string& file);
-  static std::unique_ptr<Binary> parse(const std::string& file, const ParserConfig& conf);
-  static std::unique_ptr<Binary> parse(const std::vector<uint8_t>& data,
-                                       const ParserConfig& conf = ParserConfig::deep());
+        public:
+            static std::unique_ptr<Binary> parse(const std::string &file);
 
-  static std::unique_ptr<Binary> parse(const std::vector<uint8_t>& data, uint64_t fat_offset,
-                                       const ParserConfig& conf = ParserConfig::deep());
+            static std::unique_ptr<Binary> parse(const std::string &file, const ParserConfig &conf);
 
-  static std::unique_ptr<Binary> parse(std::unique_ptr<BinaryStream> stream, uint64_t fat_offset,
-                                       const ParserConfig& conf);
+            static std::unique_ptr<Binary> parse(const std::vector<uint8_t> &data,
+                                                 const ParserConfig &conf = ParserConfig::deep());
 
-  BinaryParser& operator=(const BinaryParser& copy) = delete;
-  BinaryParser(const BinaryParser& copy) = delete;
+            static std::unique_ptr<Binary> parse(const std::vector<uint8_t> &data, uint64_t fat_offset,
+                                                 const ParserConfig &conf = ParserConfig::deep());
 
-  ~BinaryParser() override;
+            static std::unique_ptr<Binary> parse(std::unique_ptr<BinaryStream> stream, uint64_t fat_offset,
+                                                 const ParserConfig &conf);
 
-  private:
-  using exports_list_t = std::vector<std::unique_ptr<ExportInfo>>;
-  BinaryParser();
+            BinaryParser &operator=(const BinaryParser &copy) = delete;
 
-  ok_error_t init_and_parse();
+            BinaryParser(const BinaryParser &copy) = delete;
 
-  template<class MACHO_T>
-  ok_error_t parse();
+            ~BinaryParser() override;
 
-  template<class MACHO_T>
-  ok_error_t parse_header();
+        private:
+            using exports_list_t = std::vector<std::unique_ptr<ExportInfo>>;
 
-  template<class MACHO_T>
-  ok_error_t parse_load_commands();
+            BinaryParser();
 
-  template<class MACHO_T>
-  ok_error_t parse_relocations(Section& section);
+            ok_error_t init_and_parse();
 
-  // Dyld info parser
-  // ================
+            template<class MACHO_T>
+            ok_error_t parse();
 
-  // Rebase
-  // ------
-  template<class MACHO_T>
-  ok_error_t parse_dyldinfo_rebases();
+            template<class MACHO_T>
+            ok_error_t parse_header();
 
-  // Bindings
-  // --------
-  template<class MACHO_T>
-  ok_error_t parse_dyldinfo_binds();
+            template<class MACHO_T>
+            ok_error_t parse_load_commands();
 
-  template<class MACHO_T>
-  ok_error_t parse_dyldinfo_generic_bind();
+            template<class MACHO_T>
+            ok_error_t parse_relocations(Section &section);
 
-  template<class MACHO_T>
-  ok_error_t parse_dyldinfo_weak_bind();
+            // Dyld info parser
+            // ================
 
-  template<class MACHO_T>
-  ok_error_t parse_dyldinfo_lazy_bind();
+            // Rebase
+            // ------
+            template<class MACHO_T>
+            ok_error_t parse_dyldinfo_rebases();
 
-  template<class MACHO_T>
-  ok_error_t infer_indirect_bindings();
+            // Bindings
+            // --------
+            template<class MACHO_T>
+            ok_error_t parse_dyldinfo_binds();
 
-  template<class MACHO_T>
-  ok_error_t parse_symtab(SymbolCommand& cmd,
-                          SpanStream& nlist_s,
-                          SpanStream& string_s);
+            template<class MACHO_T>
+            ok_error_t parse_dyldinfo_generic_bind();
 
-  ok_error_t parse_indirect_symbols(DynamicSymbolCommand& cmd,
-                                    std::vector<Symbol*>& symtab,
-                                    BinaryStream& indirect_stream);
+            template<class MACHO_T>
+            ok_error_t parse_dyldinfo_weak_bind();
 
+            template<class MACHO_T>
+            ok_error_t parse_dyldinfo_lazy_bind();
 
-  template<class MACHO_T>
-  ok_error_t parse_data_in_code(DataInCode& cmd, BinaryStream& stream);
+            template<class MACHO_T>
+            ok_error_t infer_indirect_bindings();
 
-  using it_opaque_segments = void*; // To avoid including Binary.hpp. It must contains it_opaque_segments
+            template<class MACHO_T>
+            ok_error_t parse_symtab(SymbolCommand &cmd,
+                                    SpanStream &nlist_s,
+                                    SpanStream &string_s);
 
-  template<class MACHO_T>
-  ok_error_t do_bind(DyldBindingInfo::CLASS cls, uint8_t type, uint8_t segment_idx,
-                     uint64_t segment_offset, const std::string& symbol_name,
-                     int32_t ord, int64_t addend, bool is_weak,
-                     bool is_non_weak_definition, it_opaque_segments segments_ptr, uint64_t offset = 0);
+            ok_error_t parse_indirect_symbols(DynamicSymbolCommand &cmd,
+                                              std::vector<Symbol *> &symtab,
+                                              BinaryStream &indirect_stream);
 
 
-  template<class MACHO_T>
-  ok_error_t do_rebase(uint8_t type, uint8_t segment_idx, uint64_t segment_offset,
-                       it_opaque_segments segments);
+            template<class MACHO_T>
+            ok_error_t parse_data_in_code(DataInCode &cmd, BinaryStream &stream);
 
-  /*
-   * This set of functions are related to the parsing of LC_DYLD_CHAINED_FIXUPS
-   */
+            using it_opaque_segments = void *; // To avoid including Binary.hpp. It must contains it_opaque_segments
 
-  template<class MACHO_T>
-  ok_error_t parse_chained_payload(SpanStream& stream);
-
-  template<class MACHO_T>
-  ok_error_t parse_chained_import(const details::dyld_chained_fixups_header& header,
-                                  SpanStream& stream, SpanStream& symbol_pool);
-  template<class MACHO_T>
-  ok_error_t parse_chained_fixup(const details::dyld_chained_fixups_header& header,
-                                 SpanStream& stream);
-
-  template<class MACHO_T>
-  ok_error_t parse_fixup_seg(SpanStream& stream, uint32_t seg_info_offset,
-                             uint64_t offset, uint32_t seg_idx);
-
-  template<class MACHO_T>
-  ok_error_t do_fixup(DYLD_CHAINED_FORMAT fmt, int32_t ord, const std::string& symbol_name,
-                      int64_t addend, bool is_weak);
-
-  template<class MACHO_T>
-  ok_error_t process_fixup(SegmentCommand& segment,
-                           uint64_t chain_address, uint64_t chain_offset,
-                           const details::dyld_chained_starts_in_segment& seg_info);
-
-  template<class MACHO_T>
-  result<uint64_t> next_chain(uint64_t& chain_address, uint64_t chain_offset,
-                              const details::dyld_chained_starts_in_segment& seg_info);
-
-  template<class MACHO_T>
-  ok_error_t walk_chain(SegmentCommand& segment,
-                        uint64_t chain_address, uint64_t chain_offset,
-                        const details::dyld_chained_starts_in_segment& seg_info);
-
-  ok_error_t do_chained_fixup(SegmentCommand& segment,
-                              uint64_t chain_address, uint32_t chain_offset,
-                              const details::dyld_chained_starts_in_segment& seg_info,
-                              const details::dyld_chained_ptr_arm64e& fixup);
-
-  ok_error_t do_chained_fixup(SegmentCommand& segment,
-                              uint64_t chain_address, uint32_t chain_offset,
-                              const details::dyld_chained_starts_in_segment& seg_info,
-                              const details::dyld_chained_ptr_generic64& fixup);
-
-  ok_error_t do_chained_fixup(SegmentCommand& segment,
-                              uint64_t chain_address, uint32_t chain_offset,
-                              const details::dyld_chained_starts_in_segment& seg_info,
-                              const details::dyld_chained_ptr_generic32 & fixup);
-
-  template<class MACHO_T>
-  ok_error_t post_process(SymbolCommand& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(FunctionStarts& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(DataInCode& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(SegmentSplitInfo& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(DynamicSymbolCommand& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(LinkerOptHint& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(TwoLevelHints& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(CodeSignature& cmd);
-
-  template<class MACHO_T>
-  ok_error_t post_process(CodeSignatureDir& cmd);
-
-  ok_error_t parse_overlay();
-
-  // Exports
-  // -------
-  ok_error_t parse_dyldinfo_export();
-  ok_error_t parse_dyld_exports();
-
-  ok_error_t parse_export_trie(exports_list_t& exports, BinaryStream& stream,
-                               uint64_t start,
-                               const std::string& prefix,
-                               bool* invalid_names);
-
-  void copy_from(ChainedBindingInfo& to, ChainedBindingInfo& from);
-
-  std::unique_ptr<BinaryStream>  stream_;
-  std::unique_ptr<Binary>        binary_;
-  MACHO_TYPES                    type_ = MACHO_TYPES::MH_MAGIC_64;
-  bool                           is64_ = true;
-  ParserConfig                   config_;
-  std::set<uint64_t>             visited_;
-  std::unordered_map<std::string, Symbol*> memoized_symbols_;
-  std::map<uint64_t, Symbol*>    memoized_symbols_by_address_;
-
-  std::vector<DylibCommand*> binding_libs_;
-  std::set<uint64_t> dyld_reloc_addrs_;
-
-  // Cache of DyldChainedFixups
-  DyldChainedFixups* chained_fixups_ = nullptr;
-};
+            template<class MACHO_T>
+            ok_error_t do_bind(DyldBindingInfo::CLASS cls, uint8_t type, uint8_t segment_idx,
+                               uint64_t segment_offset, const std::string &symbol_name,
+                               int32_t ord, int64_t addend, bool is_weak,
+                               bool is_non_weak_definition, it_opaque_segments segments_ptr, uint64_t offset = 0);
 
 
-} // namespace MachO
+            template<class MACHO_T>
+            ok_error_t do_rebase(uint8_t type, uint8_t segment_idx, uint64_t segment_offset,
+                                 it_opaque_segments segments);
+
+            /*
+             * This set of functions are related to the parsing of LC_DYLD_CHAINED_FIXUPS
+             */
+
+            template<class MACHO_T>
+            ok_error_t parse_chained_payload(SpanStream &stream);
+
+            template<class MACHO_T>
+            ok_error_t parse_chained_import(const details::dyld_chained_fixups_header &header,
+                                            SpanStream &stream, SpanStream &symbol_pool);
+
+            template<class MACHO_T>
+            ok_error_t parse_chained_fixup(const details::dyld_chained_fixups_header &header,
+                                           SpanStream &stream);
+
+            template<class MACHO_T>
+            ok_error_t parse_fixup_seg(SpanStream &stream, uint32_t seg_info_offset,
+                                       uint64_t offset, uint32_t seg_idx);
+
+            template<class MACHO_T>
+            ok_error_t do_fixup(DYLD_CHAINED_FORMAT fmt, int32_t ord, const std::string &symbol_name,
+                                int64_t addend, bool is_weak);
+
+            template<class MACHO_T>
+            ok_error_t process_fixup(SegmentCommand &segment,
+                                     uint64_t chain_address, uint64_t chain_offset,
+                                     const details::dyld_chained_starts_in_segment &seg_info);
+
+            template<class MACHO_T>
+            result<uint64_t> next_chain(uint64_t &chain_address, uint64_t chain_offset,
+                                        const details::dyld_chained_starts_in_segment &seg_info);
+
+            template<class MACHO_T>
+            ok_error_t walk_chain(SegmentCommand &segment,
+                                  uint64_t chain_address, uint64_t chain_offset,
+                                  const details::dyld_chained_starts_in_segment &seg_info);
+
+            ok_error_t do_chained_fixup(SegmentCommand &segment,
+                                        uint64_t chain_address, uint32_t chain_offset,
+                                        const details::dyld_chained_starts_in_segment &seg_info,
+                                        const details::dyld_chained_ptr_arm64e &fixup);
+
+            ok_error_t do_chained_fixup(SegmentCommand &segment,
+                                        uint64_t chain_address, uint32_t chain_offset,
+                                        const details::dyld_chained_starts_in_segment &seg_info,
+                                        const details::dyld_chained_ptr_generic64 &fixup);
+
+            ok_error_t do_chained_fixup(SegmentCommand &segment,
+                                        uint64_t chain_address, uint32_t chain_offset,
+                                        const details::dyld_chained_starts_in_segment &seg_info,
+                                        const details::dyld_chained_ptr_generic32 &fixup);
+
+            template<class MACHO_T>
+            ok_error_t post_process(SymbolCommand &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(FunctionStarts &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(DataInCode &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(SegmentSplitInfo &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(DynamicSymbolCommand &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(LinkerOptHint &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(TwoLevelHints &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(CodeSignature &cmd);
+
+            template<class MACHO_T>
+            ok_error_t post_process(CodeSignatureDir &cmd);
+
+            ok_error_t parse_overlay();
+
+            // Exports
+            // -------
+            ok_error_t parse_dyldinfo_export();
+
+            ok_error_t parse_dyld_exports();
+
+            ok_error_t parse_export_trie(exports_list_t &exports, BinaryStream &stream,
+                                         uint64_t start,
+                                         const std::string &prefix,
+                                         bool *invalid_names);
+
+            void copy_from(ChainedBindingInfo &to, ChainedBindingInfo &from);
+
+            std::unique_ptr<BinaryStream> stream_;
+            std::unique_ptr<Binary> binary_;
+            MACHO_TYPES type_ = MACHO_TYPES::MH_MAGIC_64;
+            bool is64_ = true;
+            ParserConfig config_;
+            std::set<uint64_t> visited_;
+            std::unordered_map<std::string, Symbol *> memoized_symbols_;
+            std::map<uint64_t, Symbol *> memoized_symbols_by_address_;
+
+            std::vector<DylibCommand *> binding_libs_;
+            std::set<uint64_t> dyld_reloc_addrs_;
+
+            // Cache of DyldChainedFixups
+            DyldChainedFixups *chained_fixups_ = nullptr;
+        };
+
+
+    } // namespace MachO
 } // namespace LIEF
 #endif

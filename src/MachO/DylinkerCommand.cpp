@@ -21,29 +21,29 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-DylinkerCommand::DylinkerCommand(const details::dylinker_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize}
-{}
+        DylinkerCommand::DylinkerCommand(const details::dylinker_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize} {}
 
-DylinkerCommand::DylinkerCommand(std::string name) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE::LOAD_DYLINKER,
-                           static_cast<uint32_t>(align(sizeof(details::dylinker_command) + name.size() + 1, sizeof(uint64_t)))},
-  name_{std::move(name)}
-{
-  this->data(LoadCommand::raw_t(size(), 0));
-}
+        DylinkerCommand::DylinkerCommand(std::string name) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE::LOAD_DYLINKER,
+                                         static_cast<uint32_t>(align(
+                                                 sizeof(details::dylinker_command) + name.size() + 1,
+                                                 sizeof(uint64_t)))},
+                name_{std::move(name)} {
+            this->data(LoadCommand::raw_t(size(), 0));
+        }
 
-void DylinkerCommand::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void DylinkerCommand::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& DylinkerCommand::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << name();
-  return os;
-}
+        std::ostream &DylinkerCommand::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << name();
+            return os;
+        }
 
-}
+    }
 }

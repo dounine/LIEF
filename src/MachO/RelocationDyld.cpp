@@ -18,46 +18,46 @@
 #include "LIEF/MachO/DyldInfo.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-bool RelocationDyld::is_pc_relative() const {
-  return DyldInfo::REBASE_TYPE(type()) == DyldInfo::REBASE_TYPE::TEXT_PCREL32;
-}
+        bool RelocationDyld::is_pc_relative() const {
+            return DyldInfo::REBASE_TYPE(type()) == DyldInfo::REBASE_TYPE::TEXT_PCREL32;
+        }
 
-void RelocationDyld::pc_relative(bool val) {
-  if (is_pc_relative() == val) {
-    return;
-  }
+        void RelocationDyld::pc_relative(bool val) {
+            if (is_pc_relative() == val) {
+                return;
+            }
 
-  if (val) {
-    type_ = uint8_t(DyldInfo::REBASE_TYPE::TEXT_PCREL32);
-  } else {
-    if (size() == 32) {
-      type_ = uint8_t(DyldInfo::REBASE_TYPE::TEXT_ABSOLUTE32);
-    } else {
-      type_ = uint8_t(DyldInfo::REBASE_TYPE::POINTER);
+            if (val) {
+                type_ = uint8_t(DyldInfo::REBASE_TYPE::TEXT_PCREL32);
+            } else {
+                if (size() == 32) {
+                    type_ = uint8_t(DyldInfo::REBASE_TYPE::TEXT_ABSOLUTE32);
+                } else {
+                    type_ = uint8_t(DyldInfo::REBASE_TYPE::POINTER);
+                }
+            }
+        }
+
+        void RelocationDyld::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
+
+        bool RelocationDyld::operator<(const RelocationDyld &rhs) const {
+            // From ld/OutputFile.h
+            if (type() != rhs.type()) {
+                return type() < rhs.type();
+            }
+            return address() < rhs.address();
+        }
+
+        bool RelocationDyld::operator>(const RelocationDyld &rhs) const {
+            if (type() != rhs.type()) {
+                return type() > rhs.type();
+            }
+            return address() > rhs.address();
+        }
+
     }
-  }
-}
-
-void RelocationDyld::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
-
-bool RelocationDyld::operator<(const RelocationDyld& rhs) const {
-  // From ld/OutputFile.h
-  if (type() != rhs.type()) {
-    return type() < rhs.type();
-  }
-  return address() < rhs.address();
-}
-
-bool RelocationDyld::operator>(const RelocationDyld& rhs) const {
-  if (type() != rhs.type()) {
-    return type() > rhs.type();
-  }
-  return address() > rhs.address();
-}
-
-}
 }

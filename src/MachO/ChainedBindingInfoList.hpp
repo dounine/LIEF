@@ -21,44 +21,49 @@
 #include "LIEF/MachO/ChainedBindingInfo.hpp"
 
 namespace LIEF {
-namespace MachO {
-class BinaryParser;
-class Builder;
-class DyldChainedFixupsCreator;
+    namespace MachO {
+        class BinaryParser;
 
-class ChainedBindingInfoList : public ChainedBindingInfo {
+        class Builder;
 
-  friend class BinaryParser;
-  friend class Builder;
-  friend class DyldChainedFixupsCreator;
+        class DyldChainedFixupsCreator;
 
-  public:
-  static std::unique_ptr<ChainedBindingInfoList>
-    create(const ChainedBindingInfo& other);
+        class ChainedBindingInfoList : public ChainedBindingInfo {
 
-  ChainedBindingInfoList() = delete;
-  explicit ChainedBindingInfoList(DYLD_CHAINED_FORMAT fmt, bool is_weak) :
-    ChainedBindingInfo(fmt, is_weak)
-  {}
+            friend class BinaryParser;
+
+            friend class Builder;
+
+            friend class DyldChainedFixupsCreator;
+
+        public:
+            static std::unique_ptr<ChainedBindingInfoList>
+            create(const ChainedBindingInfo &other);
+
+            ChainedBindingInfoList() = delete;
+
+            explicit ChainedBindingInfoList(DYLD_CHAINED_FORMAT fmt, bool is_weak) :
+                    ChainedBindingInfo(fmt, is_weak) {}
 
 
-  ChainedBindingInfoList& operator=(ChainedBindingInfoList other) = delete;
-  ChainedBindingInfoList(const ChainedBindingInfoList& other) = delete;
+            ChainedBindingInfoList &operator=(ChainedBindingInfoList other) = delete;
 
-  ChainedBindingInfoList(ChainedBindingInfoList&&) noexcept = default;
+            ChainedBindingInfoList(const ChainedBindingInfoList &other) = delete;
 
-  void swap(ChainedBindingInfoList& other) noexcept;
+            ChainedBindingInfoList(ChainedBindingInfoList &&) noexcept = default;
 
-  ~ChainedBindingInfoList() override = default;
+            void swap(ChainedBindingInfoList &other) noexcept;
 
-  static bool classof(const BindingInfo& info) {
-    return info.type() == BindingInfo::TYPES::CHAINED_LIST;
-  }
+            ~ChainedBindingInfoList() override = default;
 
-  private:
-  std::vector<ChainedBindingInfo*> elements_;
-};
+            static bool classof(const BindingInfo &info) {
+                return info.type() == BindingInfo::TYPES::CHAINED_LIST;
+            }
 
-}
+        private:
+            std::vector<ChainedBindingInfo *> elements_;
+        };
+
+    }
 }
 #endif

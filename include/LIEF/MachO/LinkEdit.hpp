@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_LINK_EDIT_H
 #define LIEF_MACHO_LINK_EDIT_H
+
 #include <memory>
 
 #include "LIEF/visibility.h"
@@ -22,70 +23,87 @@
 #include "LIEF/MachO/SegmentCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class Binary;
-class BinaryParser;
-class Builder;
-class CodeSignatureDir;
-class DataInCode;
-class DyldChainedFixups;
-class DyldExportsTrie;
-class DyldInfo;
-class FunctionStarts;
-class LinkerOptHint;
-class SymbolCommand;
-class TwoLevelHints;
-class SegmentSplitInfo;
-class CodeSignature;
+        class Binary;
 
-class LIEF_API LinkEdit : public SegmentCommand {
+        class BinaryParser;
 
-  friend class BinaryParser;
-  friend class Binary;
-  friend class Builder;
+        class Builder;
 
-  public:
-  using SegmentCommand::SegmentCommand;
+        class CodeSignatureDir;
 
-  LinkEdit& operator=(LinkEdit other);
-  LinkEdit(const LinkEdit& copy) = default;
+        class DataInCode;
 
-  void swap(LinkEdit& other) noexcept;
+        class DyldChainedFixups;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<LinkEdit>(new LinkEdit(*this));
-  }
+        class DyldExportsTrie;
 
-  ~LinkEdit() override = default;
+        class DyldInfo;
 
-  static bool classof(const LoadCommand* cmd) {
-    return SegmentCommand::classof(cmd);
-  }
+        class FunctionStarts;
 
-  static bool segmentof(const SegmentCommand& segment) {
-    return segment.name() == "__LINKEDIT";
-  }
+        class LinkerOptHint;
 
-  private:
-  LIEF_LOCAL void update_data(const update_fnc_t& f) override;
-  LIEF_LOCAL void update_data(const update_fnc_ws_t& f,
-                              size_t where, size_t size) override;
+        class SymbolCommand;
 
-  //x-ref to keep the spans in a consistent state
-  DyldInfo* dyld_                    = nullptr;
-  DyldChainedFixups* chained_fixups_ = nullptr;
-  DyldExportsTrie* exports_trie_     = nullptr;
-  SegmentSplitInfo* seg_split_       = nullptr;
-  FunctionStarts* fstarts_           = nullptr;
-  DataInCode* data_code_             = nullptr;
-  CodeSignatureDir* code_sig_dir_    = nullptr;
-  LinkerOptHint* linker_opt_         = nullptr;
-  SymbolCommand* symtab_             = nullptr;
-  TwoLevelHints* two_lvl_hint_       = nullptr;
-  CodeSignature* code_sig_           = nullptr;
-};
+        class TwoLevelHints;
 
-}
+        class SegmentSplitInfo;
+
+        class CodeSignature;
+
+        class LIEF_API LinkEdit : public SegmentCommand {
+
+            friend class BinaryParser;
+
+            friend class Binary;
+
+            friend class Builder;
+
+        public:
+            using SegmentCommand::SegmentCommand;
+
+            LinkEdit &operator=(LinkEdit other);
+
+            LinkEdit(const LinkEdit &copy) = default;
+
+            void swap(LinkEdit &other) noexcept;
+
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<LinkEdit>(new LinkEdit(*this));
+            }
+
+            ~LinkEdit() override = default;
+
+            static bool classof(const LoadCommand *cmd) {
+                return SegmentCommand::classof(cmd);
+            }
+
+            static bool segmentof(const SegmentCommand &segment) {
+                return segment.name() == "__LINKEDIT";
+            }
+
+        private:
+            LIEF_LOCAL void update_data(const update_fnc_t &f) override;
+
+            LIEF_LOCAL void update_data(const update_fnc_ws_t &f,
+                                        size_t where, size_t size) override;
+
+            //x-ref to keep the spans in a consistent state
+            DyldInfo *dyld_ = nullptr;
+            DyldChainedFixups *chained_fixups_ = nullptr;
+            DyldExportsTrie *exports_trie_ = nullptr;
+            SegmentSplitInfo *seg_split_ = nullptr;
+            FunctionStarts *fstarts_ = nullptr;
+            DataInCode *data_code_ = nullptr;
+            CodeSignatureDir *code_sig_dir_ = nullptr;
+            LinkerOptHint *linker_opt_ = nullptr;
+            SymbolCommand *symtab_ = nullptr;
+            TwoLevelHints *two_lvl_hint_ = nullptr;
+            CodeSignature *code_sig_ = nullptr;
+        };
+
+    }
 }
 #endif

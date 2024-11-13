@@ -15,17 +15,18 @@
  */
 #ifndef LIEF_MACHO_PUBLIC_JSON_H
 #define LIEF_MACHO_PUBLIC_JSON_H
+
 #include "LIEF/visibility.h"
 #include <string>
 
 namespace LIEF {
-class Object;
+    class Object;
 
-namespace MachO {
+    namespace MachO {
 
-LIEF_API std::string to_json(const Object& v);
+        LIEF_API std::string to_json(const Object &v);
 
-}
+    }
 }
 
 #endif

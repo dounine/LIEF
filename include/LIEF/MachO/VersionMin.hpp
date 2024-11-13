@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_VERSION_MIN_COMMAND_H
 #define LIEF_MACHO_VERSION_MIN_COMMAND_H
+
 #include <ostream>
 #include <array>
 
@@ -23,62 +24,66 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct version_min_command;
-}
+        namespace details {
+            struct version_min_command;
+        }
 
 /// Class that wraps the LC_VERSION_MIN_MACOSX, LC_VERSION_MIN_IPHONEOS, ... commands.
-class LIEF_API VersionMin : public LoadCommand {
+        class LIEF_API VersionMin : public LoadCommand {
 
-  public:
-  /// Version is an array of **3** integers
-  using version_t = std::array<uint32_t, 3>;
+        public:
+            /// Version is an array of **3** integers
+            using version_t = std::array<uint32_t, 3>;
 
-  VersionMin() = default;
-  VersionMin(const details::version_min_command& version_cmd);
+            VersionMin() = default;
 
-  VersionMin& operator=(const VersionMin& copy) = default;
-  VersionMin(const VersionMin& copy) = default;
+            VersionMin(const details::version_min_command &version_cmd);
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<VersionMin>(new VersionMin(*this));
-  }
+            VersionMin &operator=(const VersionMin &copy) = default;
 
-  ~VersionMin() override = default;
+            VersionMin(const VersionMin &copy) = default;
 
-  /// Return the version as an array
-  const version_t& version() const {
-    return version_;
-  }
-  void version(const version_t& version) {
-    version_ = version;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<VersionMin>(new VersionMin(*this));
+            }
 
-  /// Return the sdk version as an array
-  const version_t& sdk() const {
-    return sdk_;
-  }
-  void sdk(const version_t& sdk) {
-    sdk_ = sdk;
-  }
+            ~VersionMin() override = default;
 
-  void accept(Visitor& visitor) const override;
+            /// Return the version as an array
+            const version_t &version() const {
+                return version_;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            void version(const version_t &version) {
+                version_ = version;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    const LoadCommand::TYPE type = cmd->command();
-    return type == LoadCommand::TYPE::VERSION_MIN_MACOSX ||
-           type == LoadCommand::TYPE::VERSION_MIN_IPHONEOS;
-  }
+            /// Return the sdk version as an array
+            const version_t &sdk() const {
+                return sdk_;
+            }
 
-  private:
-  version_t version_;
-  version_t sdk_;
-};
+            void sdk(const version_t &sdk) {
+                sdk_ = sdk;
+            }
 
-}
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                const LoadCommand::TYPE type = cmd->command();
+                return type == LoadCommand::TYPE::VERSION_MIN_MACOSX ||
+                       type == LoadCommand::TYPE::VERSION_MIN_IPHONEOS;
+            }
+
+        private:
+            version_t version_;
+            version_t sdk_;
+        };
+
+    }
 }
 #endif

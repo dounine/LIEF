@@ -15,43 +15,44 @@
  */
 #ifndef LIEF_MACHO_PARSER_CONFIG_H
 #define LIEF_MACHO_PARSER_CONFIG_H
+
 #include "LIEF/visibility.h"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
 /// This structure is used to tweak the MachO Parser (MachO::Parser)
-struct LIEF_API ParserConfig {
-  /// Return a parser configuration such as all the objects supported by
-  /// LIEF are parsed
-  static ParserConfig deep();
+        struct LIEF_API ParserConfig {
+            /// Return a parser configuration such as all the objects supported by
+            /// LIEF are parsed
+            static ParserConfig deep();
 
-  /// Return a configuration to parse the most important MachO
-  /// structures
-  static ParserConfig quick();
+            /// Return a configuration to parse the most important MachO
+            /// structures
+            static ParserConfig quick();
 
-  /// If ``flag`` is set to ``true``, Exports, Bindings and Rebases opcodes are
-  /// parsed.
-  ///
-  /// @warning Enabling this flag can slow down the parsing
-  ParserConfig& full_dyldinfo(bool flag);
+            /// If ``flag`` is set to ``true``, Exports, Bindings and Rebases opcodes are
+            /// parsed.
+            ///
+            /// @warning Enabling this flag can slow down the parsing
+            ParserConfig &full_dyldinfo(bool flag);
 
-  bool parse_dyld_exports  = true; ///< Parse the Dyld export trie
-  bool parse_dyld_bindings = true; ///< Parse the Dyld binding opcodes
-  bool parse_dyld_rebases  = true; ///< Parse the Dyld rebase opcodes
-  bool parse_overlay = true; ///< Whether the overlay data should be parsed
+            bool parse_dyld_exports = true; ///< Parse the Dyld export trie
+            bool parse_dyld_bindings = true; ///< Parse the Dyld binding opcodes
+            bool parse_dyld_rebases = true; ///< Parse the Dyld rebase opcodes
+            bool parse_overlay = true; ///< Whether the overlay data should be parsed
 
-  /// When parsing Mach-O from memory, this option
-  /// can be used to *undo* relocations and symbols bindings.
-  ///
-  /// When activated, this option requires parse_dyld_bindings
-  /// and parse_dyld_rebases to be enabled.
-  bool fix_from_memory = false;
+            /// When parsing Mach-O from memory, this option
+            /// can be used to *undo* relocations and symbols bindings.
+            ///
+            /// When activated, this option requires parse_dyld_bindings
+            /// and parse_dyld_rebases to be enabled.
+            bool fix_from_memory = false;
 
-  /// Whether the binary is coming/extracted from Dyld shared cache
-  bool from_dyld_shared_cache = false;
-};
+            /// Whether the binary is coming/extracted from Dyld shared cache
+            bool from_dyld_shared_cache = false;
+        };
 
-}
+    }
 }
 #endif

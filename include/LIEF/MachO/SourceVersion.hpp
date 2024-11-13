@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_SOURCE_VERSION_COMMAND_H
 #define LIEF_MACHO_SOURCE_VERSION_COMMAND_H
+
 #include <ostream>
 #include <array>
 
@@ -23,53 +24,56 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct source_version_command;
-}
+        namespace details {
+            struct source_version_command;
+        }
 
 /// Class that represents the MachO LoadCommand::TYPE::SOURCE_VERSION
 /// This command is used to provide the *version* of the sources used to
 /// build the binary
-class LIEF_API SourceVersion : public LoadCommand {
+        class LIEF_API SourceVersion : public LoadCommand {
 
-  public:
-  /// Version is an array of **5** integers
-  using version_t = std::array<uint32_t, 5>;
+        public:
+            /// Version is an array of **5** integers
+            using version_t = std::array<uint32_t, 5>;
 
-  SourceVersion() = default;
-  SourceVersion(const details::source_version_command& version_cmd);
+            SourceVersion() = default;
 
-  SourceVersion& operator=(const SourceVersion& copy) = default;
-  SourceVersion(const SourceVersion& copy) = default;
+            SourceVersion(const details::source_version_command &version_cmd);
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<SourceVersion>(new SourceVersion(*this));
-  }
+            SourceVersion &operator=(const SourceVersion &copy) = default;
 
-  ~SourceVersion() override = default;
+            SourceVersion(const SourceVersion &copy) = default;
 
-  /// Return the version as an array
-  const version_t& version() const {
-    return version_;
-  }
-  void version(const version_t& version) {
-    version_ = version;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<SourceVersion>(new SourceVersion(*this));
+            }
 
-  void accept(Visitor& visitor) const override;
+            ~SourceVersion() override = default;
 
-  std::ostream& print(std::ostream& os) const override;
+            /// Return the version as an array
+            const version_t &version() const {
+                return version_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::SOURCE_VERSION;
-  }
+            void version(const version_t &version) {
+                version_ = version;
+            }
 
-  private:
-  version_t version_ = {0};
-};
+            void accept(Visitor &visitor) const override;
 
-}
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::SOURCE_VERSION;
+            }
+
+        private:
+            version_t version_ = {0};
+        };
+
+    }
 }
 #endif

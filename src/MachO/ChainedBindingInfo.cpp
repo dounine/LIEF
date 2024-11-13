@@ -18,114 +18,146 @@
 #include "MachO/ChainedFixup.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-ChainedBindingInfo::ChainedBindingInfo(ChainedBindingInfo&&) noexcept = default;
-ChainedBindingInfo::ChainedBindingInfo(const ChainedBindingInfo& other) :
-  BindingInfo(other),
-  format_{other.format_},
-  ptr_format_{other.ptr_format_},
-  offset_{other.offset_},
-  btypes_{other.btypes_}
-{
+        ChainedBindingInfo::ChainedBindingInfo(ChainedBindingInfo &&) noexcept = default;
 
-  switch (btypes_) {
-    case BIND_TYPES::ARM64E_AUTH_BIND:   arm64_auth_bind_    = new details::dyld_chained_ptr_arm64e_auth_bind{*other.arm64_auth_bind_};      break;
-    case BIND_TYPES::ARM64E_BIND:        arm64_bind_         = new details::dyld_chained_ptr_arm64e_bind{*other.arm64_bind_};                break;
-    case BIND_TYPES::ARM64E_BIND24:      arm64_bind24_       = new details::dyld_chained_ptr_arm64e_bind24{*other.arm64_bind24_};            break;
-    case BIND_TYPES::ARM64E_AUTH_BIND24: arm64_auth_bind24_  = new details::dyld_chained_ptr_arm64e_auth_bind24{*other.arm64_auth_bind24_};  break;
-    case BIND_TYPES::PTR32_BIND:         p32_bind_           = new details::dyld_chained_ptr_32_bind{*other.p32_bind_};                      break;
-    case BIND_TYPES::PTR64_BIND:         p64_bind_           = new details::dyld_chained_ptr_64_bind{*other.p64_bind_};                      break;
-    case BIND_TYPES::UNKNOWN: {}
-  }
-}
+        ChainedBindingInfo::ChainedBindingInfo(const ChainedBindingInfo &other) :
+                BindingInfo(other),
+                format_{other.format_},
+                ptr_format_{other.ptr_format_},
+                offset_{other.offset_},
+                btypes_{other.btypes_} {
 
-ChainedBindingInfo::ChainedBindingInfo(DYLD_CHAINED_FORMAT fmt, bool is_weak) :
-  format_{fmt}
-{
-  is_weak_import_ = is_weak;
-}
+            switch (btypes_) {
+                case BIND_TYPES::ARM64E_AUTH_BIND:
+                    arm64_auth_bind_ = new details::dyld_chained_ptr_arm64e_auth_bind{*other.arm64_auth_bind_};
+                    break;
+                case BIND_TYPES::ARM64E_BIND:
+                    arm64_bind_ = new details::dyld_chained_ptr_arm64e_bind{*other.arm64_bind_};
+                    break;
+                case BIND_TYPES::ARM64E_BIND24:
+                    arm64_bind24_ = new details::dyld_chained_ptr_arm64e_bind24{*other.arm64_bind24_};
+                    break;
+                case BIND_TYPES::ARM64E_AUTH_BIND24:
+                    arm64_auth_bind24_ = new details::dyld_chained_ptr_arm64e_auth_bind24{*other.arm64_auth_bind24_};
+                    break;
+                case BIND_TYPES::PTR32_BIND:
+                    p32_bind_ = new details::dyld_chained_ptr_32_bind{*other.p32_bind_};
+                    break;
+                case BIND_TYPES::PTR64_BIND:
+                    p64_bind_ = new details::dyld_chained_ptr_64_bind{*other.p64_bind_};
+                    break;
+                case BIND_TYPES::UNKNOWN: {
+                }
+            }
+        }
 
-ChainedBindingInfo& ChainedBindingInfo::operator=(ChainedBindingInfo other) {
-  swap(other);
-  return *this;
-}
+        ChainedBindingInfo::ChainedBindingInfo(DYLD_CHAINED_FORMAT fmt, bool is_weak) :
+                format_{fmt} {
+            is_weak_import_ = is_weak;
+        }
 
-void ChainedBindingInfo::swap(ChainedBindingInfo& other) noexcept {
-  BindingInfo::swap(other);
-  std::swap(format_,          other.format_);
-  std::swap(ptr_format_,      other.ptr_format_);
-  std::swap(offset_,          other.offset_);
-  std::swap(btypes_,          other.btypes_);
-}
+        ChainedBindingInfo &ChainedBindingInfo::operator=(ChainedBindingInfo other) {
+            swap(other);
+            return *this;
+        }
 
-void ChainedBindingInfo::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void ChainedBindingInfo::swap(ChainedBindingInfo &other) noexcept {
+            BindingInfo::swap(other);
+            std::swap(format_, other.format_);
+            std::swap(ptr_format_, other.ptr_format_);
+            std::swap(offset_, other.offset_);
+            std::swap(btypes_, other.btypes_);
+        }
 
-uint64_t ChainedBindingInfo::sign_extended_addend() const {
-  switch (btypes_) {
-    case BIND_TYPES::ARM64E_AUTH_BIND:   return 0;
-    case BIND_TYPES::ARM64E_BIND:        return details::sign_extended_addend(*arm64_bind_);
-    case BIND_TYPES::ARM64E_BIND24:      return details::sign_extended_addend(*arm64_bind24_);
-    case BIND_TYPES::ARM64E_AUTH_BIND24: return 0;
-    case BIND_TYPES::PTR32_BIND:         return p32_bind_->addend;
-    case BIND_TYPES::PTR64_BIND:         return details::sign_extended_addend(*p64_bind_);
-    case BIND_TYPES::UNKNOWN:            return 0;
-  }
-  return 0;
-}
+        void ChainedBindingInfo::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-
-void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_bind& bind) {
-  clear();
-  btypes_ = BIND_TYPES::ARM64E_BIND;
-  arm64_bind_ = new details::dyld_chained_ptr_arm64e_bind(bind);
-}
-
-void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_auth_bind& bind) {
-  clear();
-  btypes_ = BIND_TYPES::ARM64E_AUTH_BIND;
-  arm64_auth_bind_ = new details::dyld_chained_ptr_arm64e_auth_bind(bind);
-}
-
-void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_bind24& bind) {
-  clear();
-  btypes_ = BIND_TYPES::ARM64E_BIND24;
-  arm64_bind24_ = new details::dyld_chained_ptr_arm64e_bind24(bind);
-}
-
-void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_auth_bind24& bind) {
-  clear();
-  btypes_ = BIND_TYPES::ARM64E_AUTH_BIND24;
-  arm64_auth_bind24_ = new details::dyld_chained_ptr_arm64e_auth_bind24(bind);
-}
-
-void ChainedBindingInfo::set(const details::dyld_chained_ptr_64_bind& bind) {
-  clear();
-  btypes_ = BIND_TYPES::PTR64_BIND;
-  p64_bind_ = new details::dyld_chained_ptr_64_bind(bind);
-}
-
-void ChainedBindingInfo::set(const details::dyld_chained_ptr_32_bind& bind) {
-  clear();
-  btypes_ = BIND_TYPES::PTR32_BIND;
-  p32_bind_ = new details::dyld_chained_ptr_32_bind(bind);
-}
+        uint64_t ChainedBindingInfo::sign_extended_addend() const {
+            switch (btypes_) {
+                case BIND_TYPES::ARM64E_AUTH_BIND:
+                    return 0;
+                case BIND_TYPES::ARM64E_BIND:
+                    return details::sign_extended_addend(*arm64_bind_);
+                case BIND_TYPES::ARM64E_BIND24:
+                    return details::sign_extended_addend(*arm64_bind24_);
+                case BIND_TYPES::ARM64E_AUTH_BIND24:
+                    return 0;
+                case BIND_TYPES::PTR32_BIND:
+                    return p32_bind_->addend;
+                case BIND_TYPES::PTR64_BIND:
+                    return details::sign_extended_addend(*p64_bind_);
+                case BIND_TYPES::UNKNOWN:
+                    return 0;
+            }
+            return 0;
+        }
 
 
-void ChainedBindingInfo::clear() {
-  switch (btypes_) {
-    case BIND_TYPES::ARM64E_AUTH_BIND:   delete arm64_auth_bind_;   break;
-    case BIND_TYPES::ARM64E_BIND:        delete arm64_bind_;        break;
-    case BIND_TYPES::ARM64E_BIND24:      delete arm64_bind24_;      break;
-    case BIND_TYPES::ARM64E_AUTH_BIND24: delete arm64_auth_bind24_; break;
-    case BIND_TYPES::PTR32_BIND:         delete p32_bind_;          break;
-    case BIND_TYPES::PTR64_BIND:         delete p64_bind_;          break;
-    case BIND_TYPES::UNKNOWN: {}
-  }
-  btypes_ = BIND_TYPES::UNKNOWN;
-}
+        void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_bind &bind) {
+            clear();
+            btypes_ = BIND_TYPES::ARM64E_BIND;
+            arm64_bind_ = new details::dyld_chained_ptr_arm64e_bind(bind);
+        }
 
-}
+        void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_auth_bind &bind) {
+            clear();
+            btypes_ = BIND_TYPES::ARM64E_AUTH_BIND;
+            arm64_auth_bind_ = new details::dyld_chained_ptr_arm64e_auth_bind(bind);
+        }
+
+        void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_bind24 &bind) {
+            clear();
+            btypes_ = BIND_TYPES::ARM64E_BIND24;
+            arm64_bind24_ = new details::dyld_chained_ptr_arm64e_bind24(bind);
+        }
+
+        void ChainedBindingInfo::set(const details::dyld_chained_ptr_arm64e_auth_bind24 &bind) {
+            clear();
+            btypes_ = BIND_TYPES::ARM64E_AUTH_BIND24;
+            arm64_auth_bind24_ = new details::dyld_chained_ptr_arm64e_auth_bind24(bind);
+        }
+
+        void ChainedBindingInfo::set(const details::dyld_chained_ptr_64_bind &bind) {
+            clear();
+            btypes_ = BIND_TYPES::PTR64_BIND;
+            p64_bind_ = new details::dyld_chained_ptr_64_bind(bind);
+        }
+
+        void ChainedBindingInfo::set(const details::dyld_chained_ptr_32_bind &bind) {
+            clear();
+            btypes_ = BIND_TYPES::PTR32_BIND;
+            p32_bind_ = new details::dyld_chained_ptr_32_bind(bind);
+        }
+
+
+        void ChainedBindingInfo::clear() {
+            switch (btypes_) {
+                case BIND_TYPES::ARM64E_AUTH_BIND:
+                    delete arm64_auth_bind_;
+                    break;
+                case BIND_TYPES::ARM64E_BIND:
+                    delete arm64_bind_;
+                    break;
+                case BIND_TYPES::ARM64E_BIND24:
+                    delete arm64_bind24_;
+                    break;
+                case BIND_TYPES::ARM64E_AUTH_BIND24:
+                    delete arm64_auth_bind24_;
+                    break;
+                case BIND_TYPES::PTR32_BIND:
+                    delete p32_bind_;
+                    break;
+                case BIND_TYPES::PTR64_BIND:
+                    delete p64_bind_;
+                    break;
+                case BIND_TYPES::UNKNOWN: {
+                }
+            }
+            btypes_ = BIND_TYPES::UNKNOWN;
+        }
+
+    }
 }

@@ -19,25 +19,24 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-SymbolCommand::SymbolCommand(const details::symtab_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
-  symbols_offset_{cmd.symoff},
-  nb_symbols_{cmd.nsyms},
-  strings_offset_{cmd.stroff},
-  strings_size_{cmd.strsize}
-{}
+        SymbolCommand::SymbolCommand(const details::symtab_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
+                symbols_offset_{cmd.symoff},
+                nb_symbols_{cmd.nsyms},
+                strings_offset_{cmd.stroff},
+                strings_size_{cmd.strsize} {}
 
-void SymbolCommand::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void SymbolCommand::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& SymbolCommand::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  return os;
-}
+        std::ostream &SymbolCommand::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            return os;
+        }
 
 
-}
+    }
 }

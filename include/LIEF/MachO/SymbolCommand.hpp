@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_SYMBOL_COMMAND_H
 #define LIEF_MACHO_SYMBOL_COMMAND_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -23,110 +24,117 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
-class BinaryParser;
-class LinkEdit;
+    namespace MachO {
+        class BinaryParser;
 
-namespace details {
-struct symtab_command;
-}
+        class LinkEdit;
+
+        namespace details {
+            struct symtab_command;
+        }
 
 /// Class that represents the LC_SYMTAB command
-class LIEF_API SymbolCommand : public LoadCommand {
-  friend class BinaryParser;
-  friend class LinkEdit;
+        class LIEF_API SymbolCommand : public LoadCommand {
+            friend class BinaryParser;
 
-  public:
-  SymbolCommand() = default;
-  SymbolCommand(const details::symtab_command& command);
+            friend class LinkEdit;
 
-  SymbolCommand& operator=(const SymbolCommand& copy) = default;
-  SymbolCommand(const SymbolCommand& copy) = default;
+        public:
+            SymbolCommand() = default;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<SymbolCommand>(new SymbolCommand(*this));
-  }
+            SymbolCommand(const details::symtab_command &command);
 
-  ~SymbolCommand() override = default;
+            SymbolCommand &operator=(const SymbolCommand &copy) = default;
 
-  /// Offset from the start of the file to the n_list associated with the command
-  uint32_t symbol_offset() const {
-    return symbols_offset_;
-  }
+            SymbolCommand(const SymbolCommand &copy) = default;
 
-  /// Number of symbols registered
-  uint32_t numberof_symbols() const {
-    return nb_symbols_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<SymbolCommand>(new SymbolCommand(*this));
+            }
 
-  /// Offset from the start of the file to the string table
-  uint32_t strings_offset() const {
-    return strings_offset_;
-  }
+            ~SymbolCommand() override = default;
 
-  /// Size of the size string table
-  uint32_t strings_size() const {
-    return strings_size_;
-  }
+            /// Offset from the start of the file to the n_list associated with the command
+            uint32_t symbol_offset() const {
+                return symbols_offset_;
+            }
 
-  void symbol_offset(uint32_t offset) {
-    symbols_offset_ = offset;
-  }
-  void numberof_symbols(uint32_t nb) {
-    nb_symbols_ = nb;
-  }
-  void strings_offset(uint32_t offset) {
-    strings_offset_ = offset;
-  }
-  void strings_size(uint32_t size) {
-    strings_size_ = size;
-  }
+            /// Number of symbols registered
+            uint32_t numberof_symbols() const {
+                return nb_symbols_;
+            }
 
-  span<const uint8_t> symbol_table() const {
-    return symbol_table_;
-  }
+            /// Offset from the start of the file to the string table
+            uint32_t strings_offset() const {
+                return strings_offset_;
+            }
 
-  span<uint8_t> symbol_table() {
-    return symbol_table_;
-  }
+            /// Size of the size string table
+            uint32_t strings_size() const {
+                return strings_size_;
+            }
 
-  span<const uint8_t> string_table() const {
-    return string_table_;
-  }
+            void symbol_offset(uint32_t offset) {
+                symbols_offset_ = offset;
+            }
 
-  span<uint8_t> string_table() {
-    return string_table_;
-  }
+            void numberof_symbols(uint32_t nb) {
+                nb_symbols_ = nb;
+            }
 
-  uint32_t original_str_size() const {
-    return original_str_size_;
-  }
+            void strings_offset(uint32_t offset) {
+                strings_offset_ = offset;
+            }
 
-  uint32_t original_nb_symbols() const {
-    return original_nb_symbols_;
-  }
+            void strings_size(uint32_t size) {
+                strings_size_ = size;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            span<const uint8_t> symbol_table() const {
+                return symbol_table_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            span<uint8_t> symbol_table() {
+                return symbol_table_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::SYMTAB;
-  }
+            span<const uint8_t> string_table() const {
+                return string_table_;
+            }
 
-  private:
-  uint32_t symbols_offset_ = 0;
-  uint32_t nb_symbols_     = 0;
-  uint32_t strings_offset_ = 0;
-  uint32_t strings_size_   = 0;
+            span<uint8_t> string_table() {
+                return string_table_;
+            }
 
-  uint32_t original_str_size_   = 0;
-  uint32_t original_nb_symbols_ = 0;
+            uint32_t original_str_size() const {
+                return original_str_size_;
+            }
 
-  span<uint8_t> symbol_table_;
-  span<uint8_t> string_table_;
-};
+            uint32_t original_nb_symbols() const {
+                return original_nb_symbols_;
+            }
 
-}
+            std::ostream &print(std::ostream &os) const override;
+
+            void accept(Visitor &visitor) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::SYMTAB;
+            }
+
+        private:
+            uint32_t symbols_offset_ = 0;
+            uint32_t nb_symbols_ = 0;
+            uint32_t strings_offset_ = 0;
+            uint32_t strings_size_ = 0;
+
+            uint32_t original_str_size_ = 0;
+            uint32_t original_nb_symbols_ = 0;
+
+            span<uint8_t> symbol_table_;
+            span<uint8_t> string_table_;
+        };
+
+    }
 }
 #endif

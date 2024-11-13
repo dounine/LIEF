@@ -22,34 +22,34 @@
 #include <spdlog/fmt/fmt.h>
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-template<class T>
-LIEF_LOCAL Routine::Routine(const T& cmd) :
-  LoadCommand::LoadCommand(LoadCommand::TYPE(cmd.cmd), cmd.cmdsize),
-  init_address_(cmd.init_address),
-  init_module_(cmd.init_module),
-  reserved1_(cmd.reserved1),
-  reserved2_(cmd.reserved2),
-  reserved3_(cmd.reserved3),
-  reserved4_(cmd.reserved4),
-  reserved5_(cmd.reserved5),
-  reserved6_(cmd.reserved6)
-{}
+        template<class T>
+        LIEF_LOCAL Routine::Routine(const T &cmd) :
+                LoadCommand::LoadCommand(LoadCommand::TYPE(cmd.cmd), cmd.cmdsize),
+                init_address_(cmd.init_address),
+                init_module_(cmd.init_module),
+                reserved1_(cmd.reserved1),
+                reserved2_(cmd.reserved2),
+                reserved3_(cmd.reserved3),
+                reserved4_(cmd.reserved4),
+                reserved5_(cmd.reserved5),
+                reserved6_(cmd.reserved6) {}
 
-void Routine::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void Routine::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& Routine::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << fmt::format("init_address=0x{:06x} init_module=0x{:06x}",
-                    init_address(), init_module());
-  return os;
-}
+        std::ostream &Routine::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << fmt::format("init_address=0x{:06x} init_module=0x{:06x}",
+                              init_address(), init_module());
+            return os;
+        }
 
-template Routine::Routine(const details::routines_command_32&);
-template Routine::Routine(const details::routines_command_64&);
+        template Routine::Routine(const details::routines_command_32 &);
 
-}
+        template Routine::Routine(const details::routines_command_64 &);
+
+    }
 }

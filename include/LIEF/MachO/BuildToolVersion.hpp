@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_BUILD_TOOL_VERSION_COMMAND_H
 #define LIEF_MACHO_BUILD_TOOL_VERSION_COMMAND_H
+
 #include <ostream>
 #include <array>
 #include <cstdint>
@@ -23,56 +24,57 @@
 #include "LIEF/visibility.h"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct build_tool_version;
-}
+        namespace details {
+            struct build_tool_version;
+        }
 
 /// Class that represents a tool's version that was
 /// involved in the build of the binary
-class LIEF_API BuildToolVersion : public Object {
-  public:
-  /// A version is an array of **3** integers
-  using version_t = std::array<uint32_t, 3>;
+        class LIEF_API BuildToolVersion : public Object {
+        public:
+            /// A version is an array of **3** integers
+            using version_t = std::array<uint32_t, 3>;
 
-  public:
-  enum class TOOLS {
-    UNKNOWN = 0,
-    CLANG   = 1,
-    SWIFT   = 2,
-    LD      = 3,
-    LLD     = 4,
-  };
+        public:
+            enum class TOOLS {
+                UNKNOWN = 0,
+                CLANG = 1,
+                SWIFT = 2,
+                LD = 3,
+                LLD = 4,
+            };
 
-  public:
-  BuildToolVersion() = default;
-  BuildToolVersion(const details::build_tool_version& tool);
+        public:
+            BuildToolVersion() = default;
 
-  /// The tools used
-  TOOLS tool() const {
-    return tool_;
-  }
+            BuildToolVersion(const details::build_tool_version &tool);
 
-  /// Version associated with the tool
-  version_t version() const {
-    return version_;
-  }
+            /// The tools used
+            TOOLS tool() const {
+                return tool_;
+            }
 
-  ~BuildToolVersion() override = default;
+            /// Version associated with the tool
+            version_t version() const {
+                return version_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            ~BuildToolVersion() override = default;
 
-  LIEF_API friend
-  std::ostream& operator<<(std::ostream& os, const BuildToolVersion& tool);
+            void accept(Visitor &visitor) const override;
 
-  private:
-  TOOLS tool_ = TOOLS::UNKNOWN;
-  version_t version_;
-};
+            LIEF_API friend
+            std::ostream &operator<<(std::ostream &os, const BuildToolVersion &tool);
 
-LIEF_API const char* to_string(BuildToolVersion::TOOLS tool);
+        private:
+            TOOLS tool_ = TOOLS::UNKNOWN;
+            version_t version_;
+        };
 
-}
+        LIEF_API const char *to_string(BuildToolVersion::TOOLS tool);
+
+    }
 }
 #endif

@@ -21,24 +21,23 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-DataInCode::DataInCode(const details::linkedit_data_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
-  data_offset_{cmd.dataoff},
-  data_size_{cmd.datasize}
-{}
+        DataInCode::DataInCode(const details::linkedit_data_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
+                data_offset_{cmd.dataoff},
+                data_size_{cmd.datasize} {}
 
-void DataInCode::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void DataInCode::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& DataInCode::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << fmt::format("offset=0x{:06x}, size=0x{:06x}",
-                     data_offset(), data_size());
-  return os;
-}
+        std::ostream &DataInCode::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << fmt::format("offset=0x{:06x}, size=0x{:06x}",
+                              data_offset(), data_size());
+            return os;
+        }
 
-}
+    }
 }

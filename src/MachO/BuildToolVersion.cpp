@@ -21,46 +21,45 @@
 #include "spdlog/fmt/fmt.h"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-BuildToolVersion::BuildToolVersion(const details::build_tool_version& tool) :
-  tool_{BuildToolVersion::TOOLS(tool.tool)},
-  version_{{
-    static_cast<uint32_t>((tool.version >> 16) & 0xFFFF),
-    static_cast<uint32_t>((tool.version >>  8) & 0xFF),
-    static_cast<uint32_t>((tool.version >>  0) & 0xFF)
-  }}
-{}
+        BuildToolVersion::BuildToolVersion(const details::build_tool_version &tool) :
+                tool_{BuildToolVersion::TOOLS(tool.tool)},
+                version_{{
+                                 static_cast<uint32_t>((tool.version >> 16) & 0xFFFF),
+                                 static_cast<uint32_t>((tool.version >> 8) & 0xFF),
+                                 static_cast<uint32_t>((tool.version >> 0) & 0xFF)
+                         }} {}
 
-void BuildToolVersion::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void BuildToolVersion::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& operator<<(std::ostream& os, const BuildToolVersion& tool) {
-  BuildToolVersion::version_t version = tool.version();
+        std::ostream &operator<<(std::ostream &os, const BuildToolVersion &tool) {
+            BuildToolVersion::version_t version = tool.version();
 
-  os << fmt::format("{} ({}.{}.{})",
-        to_string(tool.tool()), version[0], version[1], version[2]);
-  return os;
-}
+            os << fmt::format("{} ({}.{}.{})",
+                              to_string(tool.tool()), version[0], version[1], version[2]);
+            return os;
+        }
 
-const char* to_string(BuildToolVersion::TOOLS tool) {
-  #define ENTRY(X) std::pair(BuildToolVersion::TOOLS::X, #X)
-  STRING_MAP enums2str {
-    ENTRY(UNKNOWN),
-    ENTRY(CLANG),
-    ENTRY(SWIFT),
-    ENTRY(LD),
-    ENTRY(LLD),
-  };
-  #undef ENTRY
+        const char *to_string(BuildToolVersion::TOOLS tool) {
+#define ENTRY(X) std::pair(BuildToolVersion::TOOLS::X, #X)
+            STRING_MAP enums2str{
+                    ENTRY(UNKNOWN),
+                    ENTRY(CLANG),
+                    ENTRY(SWIFT),
+                    ENTRY(LD),
+                    ENTRY(LLD),
+            };
+#undef ENTRY
 
-  if (auto it = enums2str.find(tool); it != enums2str.end()) {
-    return it->second;
-  }
+            if (auto it = enums2str.find(tool); it != enums2str.end()) {
+                return it->second;
+            }
 
-  return "UNKNOWN";
-}
+            return "UNKNOWN";
+        }
 
-}
+    }
 }

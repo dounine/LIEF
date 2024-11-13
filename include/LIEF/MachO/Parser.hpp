@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_PARSER_H
 #define LIEF_MACHO_PARSER_H
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -27,11 +28,12 @@
 #include "LIEF/MachO/ParserConfig.hpp"
 
 namespace LIEF {
-class BinaryStream;
+    class BinaryStream;
 
-namespace MachO {
-class Binary;
-class FatBinary;
+    namespace MachO {
+        class Binary;
+
+        class FatBinary;
 
 /// The main interface to parse a Mach-O binary.
 ///
@@ -39,63 +41,67 @@ class FatBinary;
 /// Non-fat binaries are considerated as a **fat** with
 /// only one architecture. This is why MachO::Parser::parse outputs
 /// a FatBinary object.
-class LIEF_API Parser : public LIEF::Parser {
-  public:
-  Parser& operator=(const Parser& copy) = delete;
-  Parser(const Parser& copy)            = delete;
+        class LIEF_API Parser : public LIEF::Parser {
+        public:
+            Parser &operator=(const Parser &copy) = delete;
 
-  ~Parser() override;
+            Parser(const Parser &copy) = delete;
 
-  /// Parse a Mach-O file from the path provided by the ``filename``
-  /// parameter
-  ///
-  /// The @p conf parameter can be used to tweak the configuration
-  /// of the parser
-  ///
-  /// @param[in] filename   Path to the Mach-O file
-  /// @param[in] conf       Parser configuration (Defaut: ParserConfig::deep)
-  static std::unique_ptr<FatBinary> parse(const std::string& filename,
-                                          const ParserConfig& conf = ParserConfig::deep());
+            ~Parser() override;
 
-  /// Parse a Mach-O file from the raw content provided by the ``data``
-  /// parameter
-  ///
-  /// The @p conf parameter can be used to tweak the configuration
-  /// of the parser
-  ///
-  /// @param[in] data       Mach-O file as a vector of bytes
-  /// @param[in] conf       Parser configuration (Defaut: ParserConfig::deep)
-  static std::unique_ptr<FatBinary> parse(const std::vector<uint8_t>& data,
-                                          const ParserConfig& conf = ParserConfig::deep());
+            /// Parse a Mach-O file from the path provided by the ``filename``
+            /// parameter
+            ///
+            /// The @p conf parameter can be used to tweak the configuration
+            /// of the parser
+            ///
+            /// @param[in] filename   Path to the Mach-O file
+            /// @param[in] conf       Parser configuration (Defaut: ParserConfig::deep)
+            static std::unique_ptr<FatBinary> parse(const std::string &filename,
+                                                    const ParserConfig &conf = ParserConfig::deep());
+
+            /// Parse a Mach-O file from the raw content provided by the ``data``
+            /// parameter
+            ///
+            /// The @p conf parameter can be used to tweak the configuration
+            /// of the parser
+            ///
+            /// @param[in] data       Mach-O file as a vector of bytes
+            /// @param[in] conf       Parser configuration (Defaut: ParserConfig::deep)
+            static std::unique_ptr<FatBinary> parse(const std::vector<uint8_t> &data,
+                                                    const ParserConfig &conf = ParserConfig::deep());
 
 
-  /// Parser a Mach-O binary from the provided BinaryStream.
-  static std::unique_ptr<FatBinary> parse(std::unique_ptr<BinaryStream> stream,
-                                          const ParserConfig& conf = ParserConfig::deep());
+            /// Parser a Mach-O binary from the provided BinaryStream.
+            static std::unique_ptr<FatBinary> parse(std::unique_ptr<BinaryStream> stream,
+                                                    const ParserConfig &conf = ParserConfig::deep());
 
-  /// Parse the Mach-O binary from the address given in the first parameter
-  static std::unique_ptr<FatBinary> parse_from_memory(uintptr_t address,
-                                                      const ParserConfig& conf = ParserConfig::deep());
+            /// Parse the Mach-O binary from the address given in the first parameter
+            static std::unique_ptr<FatBinary> parse_from_memory(uintptr_t address,
+                                                                const ParserConfig &conf = ParserConfig::deep());
 
-  /// Parse the Mach-O binary from the address given in the first parameter
-  /// and the size given in the second parameter
-  static std::unique_ptr<FatBinary> parse_from_memory(uintptr_t address, size_t size,
-                                                      const ParserConfig& conf = ParserConfig::deep());
+            /// Parse the Mach-O binary from the address given in the first parameter
+            /// and the size given in the second parameter
+            static std::unique_ptr<FatBinary> parse_from_memory(uintptr_t address, size_t size,
+                                                                const ParserConfig &conf = ParserConfig::deep());
 
-  private:
-  Parser(const std::string& file, const ParserConfig& conf);
-  Parser(std::vector<uint8_t> data, const ParserConfig& conf);
-  Parser();
+        private:
+            Parser(const std::string &file, const ParserConfig &conf);
 
-  ok_error_t build();
-  ok_error_t build_fat();
+            Parser(std::vector<uint8_t> data, const ParserConfig &conf);
 
-  ok_error_t undo_reloc_bindings(uintptr_t base_address);
+            Parser();
 
-  std::unique_ptr<BinaryStream> stream_;
-  std::vector<std::unique_ptr<Binary>> binaries_;
-  ParserConfig config_;
-};
-}
+            ok_error_t build();
+
+            ok_error_t build_fat();
+
+            ok_error_t undo_reloc_bindings(uintptr_t base_address);
+
+            std::unique_ptr<BinaryStream> stream_;
+            std::vector<std::unique_ptr<Binary>> binaries_;
+            ParserConfig config_;
+        };
+    }
 }
 #endif

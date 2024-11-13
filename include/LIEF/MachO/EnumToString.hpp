@@ -15,22 +15,27 @@
  */
 #ifndef LIEF_MACHO_ENUM_TO_STRING_H
 #define LIEF_MACHO_ENUM_TO_STRING_H
+
 #include "LIEF/visibility.h"
 
 #include "LIEF/MachO/enums.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-LIEF_API const char* to_string(MACHO_TYPES e);
+        LIEF_API const char *to_string(MACHO_TYPES e);
 
-LIEF_API const char* to_string(X86_RELOCATION e);
-LIEF_API const char* to_string(X86_64_RELOCATION e);
-LIEF_API const char* to_string(PPC_RELOCATION e);
-LIEF_API const char* to_string(ARM_RELOCATION e);
-LIEF_API const char* to_string(ARM64_RELOCATION e);
+        LIEF_API const char *to_string(X86_RELOCATION e);
 
-} // namespace MachO
+        LIEF_API const char *to_string(X86_64_RELOCATION e);
+
+        LIEF_API const char *to_string(PPC_RELOCATION e);
+
+        LIEF_API const char *to_string(ARM_RELOCATION e);
+
+        LIEF_API const char *to_string(ARM64_RELOCATION e);
+
+    } // namespace MachO
 } // namespace LIEF
 
 #endif

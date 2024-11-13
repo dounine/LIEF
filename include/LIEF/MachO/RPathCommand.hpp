@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_RPATH_COMMAND_H
 #define LIEF_MACHO_RPATH_COMMAND_H
+
 #include <string>
 #include <ostream>
 
@@ -23,57 +24,60 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct rpath_command;
-}
+        namespace details {
+            struct rpath_command;
+        }
 
 /// Class that represents the LC_RPATH command.
 ///
 /// This command is used to add path for searching libraries
 /// associated with the ``@rpath`` prefix.
-class LIEF_API RPathCommand : public LoadCommand {
-  public:
-  RPathCommand() = default;
-  RPathCommand(std::string path);
-  RPathCommand(const details::rpath_command& rpathCmd);
+        class LIEF_API RPathCommand : public LoadCommand {
+        public:
+            RPathCommand() = default;
 
-  RPathCommand& operator=(const RPathCommand& copy) = default;
-  RPathCommand(const RPathCommand& copy) = default;
+            RPathCommand(std::string path);
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<RPathCommand>(new RPathCommand(*this));
-  }
+            RPathCommand(const details::rpath_command &rpathCmd);
 
-  /// Create a new RPath command for the provided `path`
-  static std::unique_ptr<RPathCommand> create(std::string path) {
-    return std::unique_ptr<RPathCommand>(new RPathCommand(std::move(path)));
-  }
+            RPathCommand &operator=(const RPathCommand &copy) = default;
 
-  ~RPathCommand() override = default;
+            RPathCommand(const RPathCommand &copy) = default;
 
-  /// The rpath value as a string
-  const std::string& path() const {
-    return path_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<RPathCommand>(new RPathCommand(*this));
+            }
 
-  void path(std::string path) {
-    path_ = std::move(path);
-  }
+            /// Create a new RPath command for the provided `path`
+            static std::unique_ptr<RPathCommand> create(std::string path) {
+                return std::unique_ptr<RPathCommand>(new RPathCommand(std::move(path)));
+            }
 
-  void accept(Visitor& visitor) const override;
+            ~RPathCommand() override = default;
 
-  std::ostream& print(std::ostream& os) const override;
+            /// The rpath value as a string
+            const std::string &path() const {
+                return path_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::RPATH;
-  }
+            void path(std::string path) {
+                path_ = std::move(path);
+            }
 
-  private:
-  std::string path_;
-};
+            void accept(Visitor &visitor) const override;
 
-}
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::RPATH;
+            }
+
+        private:
+            std::string path_;
+        };
+
+    }
 }
 #endif

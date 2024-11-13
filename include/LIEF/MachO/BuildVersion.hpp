@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_BUILD_VERSION_COMMAND_H
 #define LIEF_MACHO_BUILD_VERSION_COMMAND_H
+
 #include <vector>
 #include <ostream>
 #include <array>
@@ -25,102 +26,107 @@
 #include "LIEF/MachO/BuildToolVersion.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct build_version_command;
-}
+        namespace details {
+            struct build_version_command;
+        }
 
-class LIEF_API BuildVersion : public LoadCommand {
-  friend class BinaryParser;
+        class LIEF_API BuildVersion : public LoadCommand {
+            friend class BinaryParser;
 
-  public:
-  /// Version is an array of **3** integers
-  using version_t = std::array<uint32_t, 3>;
+        public:
+            /// Version is an array of **3** integers
+            using version_t = std::array<uint32_t, 3>;
 
-  using tools_list_t = std::vector<BuildToolVersion>;
+            using tools_list_t = std::vector<BuildToolVersion>;
 
-  public:
-  enum class PLATFORMS : uint32_t {
-    UNKNOWN            = 0,
-    MACOS              = 1,
-    IOS                = 2,
-    TVOS               = 3,
-    WATCHOS            = 4,
-    BRIDGEOS           = 5,
-    MAC_CATALYST       = 6,
-    IOS_SIMULATOR      = 7,
-    TVOS_SIMULATOR     = 8,
-    WATCHOS_SIMULATOR  = 9,
-    DRIVERKIT          = 10,
-    VISIONOS           = 11,
-    VISIONOS_SIMULATOR = 12,
-    FIRMWARE           = 13,
-    SEPOS              = 14,
+        public:
+            enum class PLATFORMS : uint32_t {
+                UNKNOWN = 0,
+                MACOS = 1,
+                IOS = 2,
+                TVOS = 3,
+                WATCHOS = 4,
+                BRIDGEOS = 5,
+                MAC_CATALYST = 6,
+                IOS_SIMULATOR = 7,
+                TVOS_SIMULATOR = 8,
+                WATCHOS_SIMULATOR = 9,
+                DRIVERKIT = 10,
+                VISIONOS = 11,
+                VISIONOS_SIMULATOR = 12,
+                FIRMWARE = 13,
+                SEPOS = 14,
 
-    ANY                = 0xFFFFFFFF
-  };
+                ANY = 0xFFFFFFFF
+            };
 
-  public:
-  BuildVersion() = default;
-  BuildVersion(const details::build_version_command& version_cmd);
-  BuildVersion(const PLATFORMS platform,
-               const version_t &minos,
-               const version_t &sdk,
-               const tools_list_t &tools);
+        public:
+            BuildVersion() = default;
 
-  BuildVersion& operator=(const BuildVersion& copy) = default;
-  BuildVersion(const BuildVersion& copy) = default;
+            BuildVersion(const details::build_version_command &version_cmd);
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<BuildVersion>(new BuildVersion(*this));
-  }
+            BuildVersion(const PLATFORMS platform,
+                         const version_t &minos,
+                         const version_t &sdk,
+                         const tools_list_t &tools);
 
-  version_t minos() const {
-    return minos_;
-  }
+            BuildVersion &operator=(const BuildVersion &copy) = default;
 
-  void minos(version_t version) {
-    minos_ = version;
-  }
+            BuildVersion(const BuildVersion &copy) = default;
 
-  version_t sdk() const {
-    return sdk_;
-  }
-  void sdk(version_t version) {
-    sdk_ = version;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<BuildVersion>(new BuildVersion(*this));
+            }
 
-  PLATFORMS platform() const {
-    return platform_;
-  }
-  void platform(PLATFORMS plat) {
-    platform_ = plat;
-  }
+            version_t minos() const {
+                return minos_;
+            }
 
-  const tools_list_t& tools() const {
-    return tools_;
-  }
+            void minos(version_t version) {
+                minos_ = version;
+            }
 
-  ~BuildVersion() override = default;
+            version_t sdk() const {
+                return sdk_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            void sdk(version_t version) {
+                sdk_ = version;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            PLATFORMS platform() const {
+                return platform_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::BUILD_VERSION;
-  }
+            void platform(PLATFORMS plat) {
+                platform_ = plat;
+            }
 
-  private:
-  PLATFORMS platform_ = PLATFORMS::UNKNOWN;
-  version_t minos_;
-  version_t sdk_;
-  tools_list_t tools_;
-};
+            const tools_list_t &tools() const {
+                return tools_;
+            }
 
-LIEF_API const char* to_string(BuildVersion::PLATFORMS e);
+            ~BuildVersion() override = default;
 
-}
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::BUILD_VERSION;
+            }
+
+        private:
+            PLATFORMS platform_ = PLATFORMS::UNKNOWN;
+            version_t minos_;
+            version_t sdk_;
+            tools_list_t tools_;
+        };
+
+        LIEF_API const char *to_string(BuildVersion::PLATFORMS e);
+
+    }
 }
 #endif

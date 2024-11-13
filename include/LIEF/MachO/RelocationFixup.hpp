@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_RELOCATION_FIXUP_H
 #define LIEF_MACHO_RELOCATION_FIXUP_H
+
 #include <ostream>
 #include <memory>
 
@@ -24,18 +25,20 @@
 #include "LIEF/MachO/DyldChainedFormat.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct dyld_chained_ptr_arm64e_rebase;
-struct dyld_chained_ptr_arm64e_auth_rebase;
-struct dyld_chained_ptr_64_rebase;
-struct dyld_chained_ptr_32_rebase;
-}
+        namespace details {
+            struct dyld_chained_ptr_arm64e_rebase;
+            struct dyld_chained_ptr_arm64e_auth_rebase;
+            struct dyld_chained_ptr_64_rebase;
+            struct dyld_chained_ptr_32_rebase;
+        }
 
-class BinaryParser;
-class Builder;
-class DyldChainedFixupsCreator;
+        class BinaryParser;
+
+        class Builder;
+
+        class DyldChainedFixupsCreator;
 
 /// Class that represents a rebase relocation found in the `LC_DYLD_CHAINED_FIXUPS` command.
 ///
@@ -47,113 +50,122 @@ class DyldChainedFixupsCreator;
 ///
 /// If the Mach-O loader chooses another base address (like 0x7ff100000), it must set
 /// `0x10000d270` to `0x7ff1073a8`.
-class LIEF_API RelocationFixup : public Relocation {
+        class LIEF_API RelocationFixup : public Relocation {
 
-  friend class BinaryParser;
-  friend class Builder;
-  friend class DyldChainedFixupsCreator;
+            friend class BinaryParser;
 
-  public:
-  RelocationFixup() = delete;
-  RelocationFixup(DYLD_CHAINED_PTR_FORMAT fmt, uint64_t imagebase);
+            friend class Builder;
 
-  RelocationFixup& operator=(const RelocationFixup&);
-  RelocationFixup(const RelocationFixup&);
+            friend class DyldChainedFixupsCreator;
 
-  RelocationFixup& operator=(RelocationFixup&&) noexcept = default;
-  RelocationFixup(RelocationFixup&&) noexcept = default;
+        public:
+            RelocationFixup() = delete;
 
-  ~RelocationFixup() override;
+            RelocationFixup(DYLD_CHAINED_PTR_FORMAT fmt, uint64_t imagebase);
 
-  std::unique_ptr<Relocation> clone() const override {
-    return std::unique_ptr<RelocationFixup>(new RelocationFixup(*this));
-  }
+            RelocationFixup &operator=(const RelocationFixup &);
 
-  /// Not relevant for this kind of relocation
-  bool is_pc_relative() const override {
-    return false;
-  }
+            RelocationFixup(const RelocationFixup &);
 
-  /// Origin of the relocation. For this concrete object, it
-  /// should be Relocation::ORIGIN::CHAINED_FIXUPS
-  ORIGIN origin() const override {
-    return ORIGIN::CHAINED_FIXUPS;
-  }
+            RelocationFixup &operator=(RelocationFixup &&) noexcept = default;
 
-  DYLD_CHAINED_PTR_FORMAT ptr_format() const {
-    return ptr_fmt_;
-  }
+            RelocationFixup(RelocationFixup &&) noexcept = default;
 
-  /// The value that should be set at the address pointed by LIEF::Relocation::address
-  /// if the imagebase chosen by the loader is LIEF::Binary::imagebase.
-  /// Otherwise: target() - LIEF::Binary::imagebase() + new_imagebase.
-  uint64_t target() const;
-  void target(uint64_t target);
+            ~RelocationFixup() override;
 
-  /// Not relevant for this kind of relocation
-  void pc_relative(bool) override {}
+            std::unique_ptr<Relocation> clone() const override {
+                return std::unique_ptr<RelocationFixup>(new RelocationFixup(*this));
+            }
 
-  uint32_t offset() const {
-    return offset_;
-  }
+            /// Not relevant for this kind of relocation
+            bool is_pc_relative() const override {
+                return false;
+            }
 
-  void offset(uint32_t offset) {
-    offset_ = offset;
-  }
+            /// Origin of the relocation. For this concrete object, it
+            /// should be Relocation::ORIGIN::CHAINED_FIXUPS
+            ORIGIN origin() const override {
+                return ORIGIN::CHAINED_FIXUPS;
+            }
 
-  /// The address of this relocation is bound to its offset.
-  uint64_t address() const override {
-    return address_;
-  }
+            DYLD_CHAINED_PTR_FORMAT ptr_format() const {
+                return ptr_fmt_;
+            }
 
-  /// Changing the address means changing the offset
-  void address(uint64_t address) override {
-    address_ = address;
-  }
+            /// The value that should be set at the address pointed by LIEF::Relocation::address
+            /// if the imagebase chosen by the loader is LIEF::Binary::imagebase.
+            /// Otherwise: target() - LIEF::Binary::imagebase() + new_imagebase.
+            uint64_t target() const;
 
-  /// Return the (unscaled) next offset in the chain
-  uint32_t next() const;
+            void target(uint64_t target);
 
-  /// Change next offset of the current element
-  void next(uint32_t value);
+            /// Not relevant for this kind of relocation
+            void pc_relative(bool) override {}
 
-  void accept(Visitor& visitor) const override;
+            uint32_t offset() const {
+                return offset_;
+            }
 
-  static bool classof(const Relocation& r) {
-    return r.origin() == Relocation::ORIGIN::CHAINED_FIXUPS;
-  }
+            void offset(uint32_t offset) {
+                offset_ = offset;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            /// The address of this relocation is bound to its offset.
+            uint64_t address() const override {
+                return address_;
+            }
 
-  private:
-  enum class REBASE_TYPES {
-    UNKNOWN = 0,
+            /// Changing the address means changing the offset
+            void address(uint64_t address) override {
+                address_ = address;
+            }
 
-    ARM64E_REBASE,
-    ARM64E_AUTH_REBASE,
-    PTR64_REBASE,
-    PTR32_REBASE,
-  };
+            /// Return the (unscaled) next offset in the chain
+            uint32_t next() const;
 
-  void set(const details::dyld_chained_ptr_arm64e_rebase& fixup);
-  void set(const details::dyld_chained_ptr_arm64e_auth_rebase& fixup);
-  void set(const details::dyld_chained_ptr_64_rebase& fixup);
-  void set(const details::dyld_chained_ptr_32_rebase& fixup);
+            /// Change next offset of the current element
+            void next(uint32_t value);
 
-  DYLD_CHAINED_PTR_FORMAT ptr_fmt_ = DYLD_CHAINED_PTR_FORMAT::PTR_32;
-  uint64_t imagebase_ = 0;
-  uint32_t offset_ = 0;
+            void accept(Visitor &visitor) const override;
 
-  REBASE_TYPES rtypes_ = REBASE_TYPES::UNKNOWN;
+            static bool classof(const Relocation &r) {
+                return r.origin() == Relocation::ORIGIN::CHAINED_FIXUPS;
+            }
 
-  union {
-    details::dyld_chained_ptr_arm64e_rebase*      arm64_rebase_ = nullptr;
-    details::dyld_chained_ptr_arm64e_auth_rebase* arm64_auth_rebase_;
-    details::dyld_chained_ptr_64_rebase*          p64_rebase_;
-    details::dyld_chained_ptr_32_rebase*          p32_rebase_;
-  };
-};
+            std::ostream &print(std::ostream &os) const override;
 
-}
+        private:
+            enum class REBASE_TYPES {
+                UNKNOWN = 0,
+
+                ARM64E_REBASE,
+                ARM64E_AUTH_REBASE,
+                PTR64_REBASE,
+                PTR32_REBASE,
+            };
+
+            void set(const details::dyld_chained_ptr_arm64e_rebase &fixup);
+
+            void set(const details::dyld_chained_ptr_arm64e_auth_rebase &fixup);
+
+            void set(const details::dyld_chained_ptr_64_rebase &fixup);
+
+            void set(const details::dyld_chained_ptr_32_rebase &fixup);
+
+            DYLD_CHAINED_PTR_FORMAT ptr_fmt_ = DYLD_CHAINED_PTR_FORMAT::PTR_32;
+            uint64_t imagebase_ = 0;
+            uint32_t offset_ = 0;
+
+            REBASE_TYPES rtypes_ = REBASE_TYPES::UNKNOWN;
+
+            union {
+                details::dyld_chained_ptr_arm64e_rebase *arm64_rebase_ = nullptr;
+                details::dyld_chained_ptr_arm64e_auth_rebase *arm64_auth_rebase_;
+                details::dyld_chained_ptr_64_rebase *p64_rebase_;
+                details::dyld_chained_ptr_32_rebase *p32_rebase_;
+            };
+        };
+
+    }
 }
 #endif

@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_FUNCTION_STARTS_COMMAND_H
 #define LIEF_MACHO_FUNCTION_STARTS_COMMAND_H
+
 #include <vector>
 #include <ostream>
 
@@ -24,96 +25,102 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
-class BinaryParser;
-class LinkEdit;
+    namespace MachO {
+        class BinaryParser;
 
-namespace details {
-struct linkedit_data_command;
-}
+        class LinkEdit;
+
+        namespace details {
+            struct linkedit_data_command;
+        }
 
 
 /// Class which represents the LC_FUNCTION_STARTS command
 ///
 /// This command is an array of ULEB128 encoded values
-class LIEF_API FunctionStarts : public LoadCommand {
-  friend class BinaryParser;
-  friend class LinkEdit;
+        class LIEF_API FunctionStarts : public LoadCommand {
+            friend class BinaryParser;
 
-  public:
-  FunctionStarts() = default;
-  FunctionStarts(const details::linkedit_data_command& cmd);
+            friend class LinkEdit;
 
-  FunctionStarts& operator=(const FunctionStarts& copy) = default;
-  FunctionStarts(const FunctionStarts& copy) = default;
+        public:
+            FunctionStarts() = default;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<FunctionStarts>(new FunctionStarts(*this));
-  }
+            FunctionStarts(const details::linkedit_data_command &cmd);
 
-  /// Offset in the ``__LINKEDIT`` SegmentCommand where *start functions* are located
-  uint32_t data_offset() const {
-    return data_offset_;
-  }
+            FunctionStarts &operator=(const FunctionStarts &copy) = default;
 
-  /// Size of the functions list in the binary
-  uint32_t data_size() const {
-    return data_size_;
-  }
+            FunctionStarts(const FunctionStarts &copy) = default;
 
-  /// Addresses of every function entry point in the executable.
-  ///
-  /// This allows functions to exist for which there are no entries in the symbol table.
-  ///
-  /// @warning The address is relative to the ``__TEXT`` segment
-  const std::vector<uint64_t>& functions() const {
-    return functions_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<FunctionStarts>(new FunctionStarts(*this));
+            }
 
-  std::vector<uint64_t>& functions() {
-    return functions_;
-  }
+            /// Offset in the ``__LINKEDIT`` SegmentCommand where *start functions* are located
+            uint32_t data_offset() const {
+                return data_offset_;
+            }
 
-  /// Add a new function
-  void add_function(uint64_t address) {
-    functions_.emplace_back(address);
-  }
+            /// Size of the functions list in the binary
+            uint32_t data_size() const {
+                return data_size_;
+            }
 
-  void data_offset(uint32_t offset) {
-    data_offset_ = offset;
-  }
-  void data_size(uint32_t size) {
-    data_size_ = size;
-  }
+            /// Addresses of every function entry point in the executable.
+            ///
+            /// This allows functions to exist for which there are no entries in the symbol table.
+            ///
+            /// @warning The address is relative to the ``__TEXT`` segment
+            const std::vector<uint64_t> &functions() const {
+                return functions_;
+            }
 
-  void functions(std::vector<uint64_t> funcs) {
-    functions_ = std::move(funcs);
-  }
+            std::vector<uint64_t> &functions() {
+                return functions_;
+            }
 
-  span<const uint8_t> content() const {
-    return content_;
-  }
+            /// Add a new function
+            void add_function(uint64_t address) {
+                functions_.emplace_back(address);
+            }
 
-  span<uint8_t> content() {
-    return content_;
-  }
+            void data_offset(uint32_t offset) {
+                data_offset_ = offset;
+            }
 
-  ~FunctionStarts() override = default;
+            void data_size(uint32_t size) {
+                data_size_ = size;
+            }
 
-  void accept(Visitor& visitor) const override;
+            void functions(std::vector<uint64_t> funcs) {
+                functions_ = std::move(funcs);
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            span<const uint8_t> content() const {
+                return content_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::FUNCTION_STARTS;
-  }
-  private:
-  uint32_t data_offset_ = 0;
-  uint32_t data_size_ = 0;
-  span<uint8_t> content_;
-  std::vector<uint64_t> functions_;
-};
+            span<uint8_t> content() {
+                return content_;
+            }
 
-}
+            ~FunctionStarts() override = default;
+
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::FUNCTION_STARTS;
+            }
+
+        private:
+            uint32_t data_offset_ = 0;
+            uint32_t data_size_ = 0;
+            span<uint8_t> content_;
+            std::vector<uint64_t> functions_;
+        };
+
+    }
 }
 #endif

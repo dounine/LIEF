@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_SECTION_H
 #define LIEF_MACHO_SECTION_H
+
 #include <string>
 #include <vector>
 #include <ostream>
@@ -28,274 +29,297 @@
 #include "LIEF/iterators.hpp"
 
 namespace LIEF {
-class SpanStream;
+    class SpanStream;
 
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
-class SegmentCommand;
-class Binary;
-class Relocation;
+        class BinaryParser;
 
-namespace details {
-struct section_32;
-struct section_64;
-}
+        class SegmentCommand;
+
+        class Binary;
+
+        class Relocation;
+
+        namespace details {
+            struct section_32;
+            struct section_64;
+        }
 
 /// Class that represents a Mach-O section
-class LIEF_API Section : public LIEF::Section {
+        class LIEF_API Section : public LIEF::Section {
 
-  friend class BinaryParser;
-  friend class Binary;
-  friend class SegmentCommand;
+            friend class BinaryParser;
 
-  public:
-  using content_t   = std::vector<uint8_t>;
+            friend class Binary;
 
-  /// Internal container for storing Mach-O Relocation
-  using relocations_t = std::vector<std::unique_ptr<Relocation>>;
+            friend class SegmentCommand;
 
-  /// Iterator which outputs Relocation&
-  using it_relocations = ref_iterator<relocations_t&, Relocation*>;
+        public:
+            using content_t = std::vector<uint8_t>;
 
-  /// Iterator which outputs const Relocation&
-  using it_const_relocations = const_ref_iterator<const relocations_t&, const Relocation*>;
+            /// Internal container for storing Mach-O Relocation
+            using relocations_t = std::vector<std::unique_ptr<Relocation>>;
 
-  static constexpr auto FLAGS_MASK = uint32_t(0xffffff00u);
-  static constexpr auto TYPE_MASK = uint32_t(0xff);
+            /// Iterator which outputs Relocation&
+            using it_relocations = ref_iterator<relocations_t &, Relocation *>;
 
-  enum class TYPE: uint64_t  {
-    REGULAR                             = 0x00u, ///< Regular section.
-    ZEROFILL                            = 0x01u, ///< Zero fill on demand section.
-    CSTRING_LITERALS                    = 0x02u, ///< Section with literal C strings.
-    S_4BYTE_LITERALS                    = 0x03u, ///< Section with 4 byte literals.
-    S_8BYTE_LITERALS                    = 0x04u, ///< Section with 8 byte literals.
-    LITERAL_POINTERS                    = 0x05u, ///< Section with pointers to literals.
-    NON_LAZY_SYMBOL_POINTERS            = 0x06u, ///< Section with non-lazy symbol pointers.
-    LAZY_SYMBOL_POINTERS                = 0x07u, ///< Section with lazy symbol pointers.
-    SYMBOL_STUBS                        = 0x08u, ///< Section with symbol stubs, byte size of stub in the Reserved2 field.
-    MOD_INIT_FUNC_POINTERS              = 0x09u, ///< Section with only function pointers for initialization.
-    MOD_TERM_FUNC_POINTERS              = 0x0au, ///< Section with only function pointers for termination.
-    COALESCED                           = 0x0bu, ///< Section contains symbols that are to be coalesced.
-    GB_ZEROFILL                         = 0x0cu, ///< Zero fill on demand section (that can be larger than 4 gigabytes).
-    INTERPOSING                         = 0x0du, ///< Section with only pairs of function pointers for interposing.
-    S_16BYTE_LITERALS                   = 0x0eu, ///< Section with only 16 byte literals.
-    DTRACE_DOF                          = 0x0fu, ///< Section contains DTrace Object Format.
-    LAZY_DYLIB_SYMBOL_POINTERS          = 0x10u, ///< Section with lazy symbol pointers to lazy loaded dylibs.
-    THREAD_LOCAL_REGULAR                = 0x11u, ///< Thread local data section.
-    THREAD_LOCAL_ZEROFILL               = 0x12u, ///< Thread local zerofill section.
-    THREAD_LOCAL_VARIABLES              = 0x13u, ///< Section with thread local variable structure data.
-    THREAD_LOCAL_VARIABLE_POINTERS      = 0x14u, ///< Section with pointers to thread local structures.
-    THREAD_LOCAL_INIT_FUNCTION_POINTERS = 0x15u, ///< Section with thread local variable initialization pointers to functions.
-    INIT_FUNC_OFFSETS                   = 0x16u, ///< Section with 32-bit offsets to initializer functions
-  };
+            /// Iterator which outputs const Relocation&
+            using it_const_relocations = const_ref_iterator<const relocations_t &, const Relocation *>;
 
-  enum class FLAGS: uint64_t  {
-    PURE_INSTRUCTIONS   = 0x80000000u, ///< Section contains only true machine instructions
-    NO_TOC              = 0x40000000u, ///< Section contains coalesced symbols that are not to be in a ranlib table of contents.
-    STRIP_STATIC_SYMS   = 0x20000000u, ///< Ok to strip static symbols in this section in files with the MY_DYLDLINK flag.
-    NO_DEAD_STRIP       = 0x10000000u, ///< No dead stripping.
-    LIVE_SUPPORT        = 0x08000000u, ///< Blocks are live if they reference live blocks.
-    SELF_MODIFYING_CODE = 0x04000000u, ///< Used with i386 code stubs written on by dyld
-    DEBUG_INFO          = 0x02000000u, ///< A debug section.
+            static constexpr auto FLAGS_MASK = uint32_t(0xffffff00u);
+            static constexpr auto TYPE_MASK = uint32_t(0xff);
 
-    SOME_INSTRUCTIONS   = 0x00000400u, ///< Section contains some machine instructions.
-    EXT_RELOC           = 0x00000200u, ///< Section has external relocation entries.
-    LOC_RELOC           = 0x00000100u, ///< Section has local relocation entries.
-  };
+            enum class TYPE : uint64_t {
+                REGULAR = 0x00u, ///< Regular section.
+                ZEROFILL = 0x01u, ///< Zero fill on demand section.
+                CSTRING_LITERALS = 0x02u, ///< Section with literal C strings.
+                S_4BYTE_LITERALS = 0x03u, ///< Section with 4 byte literals.
+                S_8BYTE_LITERALS = 0x04u, ///< Section with 8 byte literals.
+                LITERAL_POINTERS = 0x05u, ///< Section with pointers to literals.
+                NON_LAZY_SYMBOL_POINTERS = 0x06u, ///< Section with non-lazy symbol pointers.
+                LAZY_SYMBOL_POINTERS = 0x07u, ///< Section with lazy symbol pointers.
+                SYMBOL_STUBS = 0x08u, ///< Section with symbol stubs, byte size of stub in the Reserved2 field.
+                MOD_INIT_FUNC_POINTERS = 0x09u, ///< Section with only function pointers for initialization.
+                MOD_TERM_FUNC_POINTERS = 0x0au, ///< Section with only function pointers for termination.
+                COALESCED = 0x0bu, ///< Section contains symbols that are to be coalesced.
+                GB_ZEROFILL = 0x0cu, ///< Zero fill on demand section (that can be larger than 4 gigabytes).
+                INTERPOSING = 0x0du, ///< Section with only pairs of function pointers for interposing.
+                S_16BYTE_LITERALS = 0x0eu, ///< Section with only 16 byte literals.
+                DTRACE_DOF = 0x0fu, ///< Section contains DTrace Object Format.
+                LAZY_DYLIB_SYMBOL_POINTERS = 0x10u, ///< Section with lazy symbol pointers to lazy loaded dylibs.
+                THREAD_LOCAL_REGULAR = 0x11u, ///< Thread local data section.
+                THREAD_LOCAL_ZEROFILL = 0x12u, ///< Thread local zerofill section.
+                THREAD_LOCAL_VARIABLES = 0x13u, ///< Section with thread local variable structure data.
+                THREAD_LOCAL_VARIABLE_POINTERS = 0x14u, ///< Section with pointers to thread local structures.
+                THREAD_LOCAL_INIT_FUNCTION_POINTERS = 0x15u, ///< Section with thread local variable initialization pointers to functions.
+                INIT_FUNC_OFFSETS = 0x16u, ///< Section with 32-bit offsets to initializer functions
+            };
 
-  public:
-  Section();
-  Section(const details::section_32& section_cmd);
-  Section(const details::section_64& section_cmd);
+            enum class FLAGS : uint64_t {
+                PURE_INSTRUCTIONS = 0x80000000u, ///< Section contains only true machine instructions
+                NO_TOC = 0x40000000u, ///< Section contains coalesced symbols that are not to be in a ranlib table of contents.
+                STRIP_STATIC_SYMS = 0x20000000u, ///< Ok to strip static symbols in this section in files with the MY_DYLDLINK flag.
+                NO_DEAD_STRIP = 0x10000000u, ///< No dead stripping.
+                LIVE_SUPPORT = 0x08000000u, ///< Blocks are live if they reference live blocks.
+                SELF_MODIFYING_CODE = 0x04000000u, ///< Used with i386 code stubs written on by dyld
+                DEBUG_INFO = 0x02000000u, ///< A debug section.
 
-  Section(std::string name);
-  Section(std::string name, content_t content);
+                SOME_INSTRUCTIONS = 0x00000400u, ///< Section contains some machine instructions.
+                EXT_RELOC = 0x00000200u, ///< Section has external relocation entries.
+                LOC_RELOC = 0x00000100u, ///< Section has local relocation entries.
+            };
 
-  Section& operator=(Section copy);
-  Section(const Section& copy);
+        public:
+            Section();
 
-  void swap(Section& other) noexcept;
+            Section(const details::section_32 &section_cmd);
 
-  ~Section() override;
+            Section(const details::section_64 &section_cmd);
 
-  span<const uint8_t> content() const override;
+            Section(std::string name);
 
-  /// Update the content of the section
-  void content(const content_t& data) override;
+            Section(std::string name, content_t content);
 
-  /// Return the name of the segment linked to this section
-  const std::string& segment_name() const;
+            Section &operator=(Section copy);
 
-  /// Virtual base address of the section
-  uint64_t address() const {
-    return virtual_address();
-  }
+            Section(const Section &copy);
 
-  /// Section alignment as a power of 2
-  uint32_t alignment() const {
-    return align_;
-  }
+            void swap(Section &other) noexcept;
 
-  /// Offset of the relocation table. This value should be 0
-  /// for executable and libraries as the relocations are managed by the DyldInfo::rebase
-  ///
-  /// On the other hand, for object files (``.o``) this value should not be 0
-  ///
-  /// @see numberof_relocations
-  /// @see relocations
-  uint32_t relocation_offset() const {
-    return relocations_offset_;
-  }
+            ~Section() override;
 
-  /// Number of relocations associated with this section
-  uint32_t numberof_relocations() const {
-    return nbof_relocations_;
-  }
+            span<const uint8_t> content() const override;
 
-  /// Section's flags masked with SECTION_FLAGS_MASK (see: Section::FLAGS)
-  ///
-  /// @see flags
-  FLAGS flags() const {
-    return FLAGS(flags_ & FLAGS_MASK);
-  }
+            /// Update the content of the section
+            void content(const content_t &data) override;
 
-  /// Type of the section. This value can help to determine
-  /// the purpose of the section (e.g. MACHO_SECTION_TYPES::MACHO_SECTION_TYPES)
-  TYPE type() const {
-    return TYPE(flags_ & TYPE_MASK);
-  }
+            /// Return the name of the segment linked to this section
+            const std::string &segment_name() const;
 
-  /// According to the official ``loader.h`` file, this value is reserved
-  /// for *offset* or *index*
-  uint32_t reserved1() const {
-    return reserved1_;
-  }
+            /// Virtual base address of the section
+            uint64_t address() const {
+                return virtual_address();
+            }
 
-  /// According to the official ``loader.h`` file, this value is reserved
-  /// for *count* or *sizeof*
-  uint32_t reserved2() const {
-    return reserved2_;
-  }
+            /// Section alignment as a power of 2
+            uint32_t alignment() const {
+                return align_;
+            }
 
-  /// This value is only present for 64 bits Mach-O files. In that case,
-  /// the value is *reserved*.
-  uint32_t reserved3() const {
-    return reserved3_;
-  }
+            /// Offset of the relocation table. This value should be 0
+            /// for executable and libraries as the relocations are managed by the DyldInfo::rebase
+            ///
+            /// On the other hand, for object files (``.o``) this value should not be 0
+            ///
+            /// @see numberof_relocations
+            /// @see relocations
+            uint32_t relocation_offset() const {
+                return relocations_offset_;
+            }
 
-  /// Return the Section::flags as a list of Section::FLAGS
-  /// @see flags
-  std::vector<FLAGS> flags_list() const;
+            /// Number of relocations associated with this section
+            uint32_t numberof_relocations() const {
+                return nbof_relocations_;
+            }
 
-  /// Section flags without applying the SECTION_FLAGS_MASK mask
-  uint32_t raw_flags() const {
-    return flags_;
-  }
+            /// Section's flags masked with SECTION_FLAGS_MASK (see: Section::FLAGS)
+            ///
+            /// @see flags
+            FLAGS flags() const {
+                return FLAGS(flags_ & FLAGS_MASK);
+            }
 
-  /// Check if this section is correctly linked with a MachO::SegmentCommand
-  bool has_segment() const {
-    return segment() != nullptr;
-  }
+            /// Type of the section. This value can help to determine
+            /// the purpose of the section (e.g. MACHO_SECTION_TYPES::MACHO_SECTION_TYPES)
+            TYPE type() const {
+                return TYPE(flags_ & TYPE_MASK);
+            }
 
-  /// The segment associated with this section or a nullptr
-  /// if not present
-  SegmentCommand* segment() {
-    return segment_;
-  }
-  const SegmentCommand* segment() const {
-    return segment_;
-  }
+            /// According to the official ``loader.h`` file, this value is reserved
+            /// for *offset* or *index*
+            uint32_t reserved1() const {
+                return reserved1_;
+            }
 
-  /// Return a stream over the content of this section
-  std::unique_ptr<SpanStream> stream() const;
+            /// According to the official ``loader.h`` file, this value is reserved
+            /// for *count* or *sizeof*
+            uint32_t reserved2() const {
+                return reserved2_;
+            }
 
-  /// Clear the content of this section by filling its values
-  /// with the byte provided in parameter
-  void clear(uint8_t v);
+            /// This value is only present for 64 bits Mach-O files. In that case,
+            /// the value is *reserved*.
+            uint32_t reserved3() const {
+                return reserved3_;
+            }
 
-  /// Return an iterator over the MachO::Relocation associated with this section
-  ///
-  /// This iterator is likely to be empty of executable and libraries while it should not
-  /// for object files (``.o``)
-  it_relocations relocations() {
-    return relocations_;
-  }
-  it_const_relocations relocations() const {
-    return relocations_;
-  }
+            /// Return the Section::flags as a list of Section::FLAGS
+            /// @see flags
+            std::vector<FLAGS> flags_list() const;
 
-  void segment_name(const std::string& name);
-  void address(uint64_t address) {
-    virtual_address(address);
-  }
-  void alignment(uint32_t align) {
-    align_ = align;
-  }
-  void relocation_offset(uint32_t offset) {
-    relocations_offset_ = offset;
-  }
-  void numberof_relocations(uint32_t nb_reloc) {
-    nbof_relocations_ = nb_reloc;
-  }
-  void flags(uint32_t flags) {
-    flags_ = flags_ | flags;
-  }
-  void flags(std::vector<FLAGS> flags);
-  void type(TYPE type) {
-    flags_ = (flags_ & FLAGS_MASK) | uint8_t(type);
-  }
-  void reserved1(uint32_t reserved1) {
-    reserved1_ = reserved1;
-  }
-  void reserved2(uint32_t reserved2) {
-    reserved2_ = reserved2;
-  }
-  void reserved3(uint32_t reserved3) {
-    reserved3_ = reserved3;
-  }
+            /// Section flags without applying the SECTION_FLAGS_MASK mask
+            uint32_t raw_flags() const {
+                return flags_;
+            }
 
-  /// Check if the section has the given Section::FLAGS flag
-  bool has(FLAGS flag) const;
+            /// Check if this section is correctly linked with a MachO::SegmentCommand
+            bool has_segment() const {
+                return segment() != nullptr;
+            }
 
-  /// Append a Section::FLAGS to the current section
-  void add(FLAGS flag);
+            /// The segment associated with this section or a nullptr
+            /// if not present
+            SegmentCommand *segment() {
+                return segment_;
+            }
 
-  /// Remove a Section::FLAGS to the current section
-  void remove(FLAGS flag);
+            const SegmentCommand *segment() const {
+                return segment_;
+            }
 
-  Section& operator+=(FLAGS flag) {
-    add(flag);
-    return *this;
-  }
-  Section& operator-=(FLAGS flag) {
-    remove(flag);
-    return *this;
-  }
+            /// Return a stream over the content of this section
+            std::unique_ptr<SpanStream> stream() const;
 
-  void accept(Visitor& visitor) const override;
+            /// Clear the content of this section by filling its values
+            /// with the byte provided in parameter
+            void clear(uint8_t v);
 
-  LIEF_API friend std::ostream& operator<<(std::ostream& os, const Section& section);
+            /// Return an iterator over the MachO::Relocation associated with this section
+            ///
+            /// This iterator is likely to be empty of executable and libraries while it should not
+            /// for object files (``.o``)
+            it_relocations relocations() {
+                return relocations_;
+            }
 
-  private:
-  std::string segment_name_;
-  uint64_t original_size_ = 0;
-  uint32_t align_ = 0;
-  uint32_t relocations_offset_ = 0;
-  uint32_t nbof_relocations_ = 0;
-  uint32_t flags_ = 0;
-  uint32_t reserved1_ = 0;
-  uint32_t reserved2_ = 0;
-  uint32_t reserved3_ = 0;
-  content_t content_;
-  SegmentCommand *segment_ = nullptr;
-  relocations_t relocations_;
-};
+            it_const_relocations relocations() const {
+                return relocations_;
+            }
 
-LIEF_API const char* to_string(Section::TYPE type);
-LIEF_API const char* to_string(Section::FLAGS flag);
+            void segment_name(const std::string &name);
 
-}
+            void address(uint64_t address) {
+                virtual_address(address);
+            }
+
+            void alignment(uint32_t align) {
+                align_ = align;
+            }
+
+            void relocation_offset(uint32_t offset) {
+                relocations_offset_ = offset;
+            }
+
+            void numberof_relocations(uint32_t nb_reloc) {
+                nbof_relocations_ = nb_reloc;
+            }
+
+            void flags(uint32_t flags) {
+                flags_ = flags_ | flags;
+            }
+
+            void flags(std::vector<FLAGS> flags);
+
+            void type(TYPE type) {
+                flags_ = (flags_ & FLAGS_MASK) | uint8_t(type);
+            }
+
+            void reserved1(uint32_t reserved1) {
+                reserved1_ = reserved1;
+            }
+
+            void reserved2(uint32_t reserved2) {
+                reserved2_ = reserved2;
+            }
+
+            void reserved3(uint32_t reserved3) {
+                reserved3_ = reserved3;
+            }
+
+            /// Check if the section has the given Section::FLAGS flag
+            bool has(FLAGS flag) const;
+
+            /// Append a Section::FLAGS to the current section
+            void add(FLAGS flag);
+
+            /// Remove a Section::FLAGS to the current section
+            void remove(FLAGS flag);
+
+            Section &operator+=(FLAGS flag) {
+                add(flag);
+                return *this;
+            }
+
+            Section &operator-=(FLAGS flag) {
+                remove(flag);
+                return *this;
+            }
+
+            void accept(Visitor &visitor) const override;
+
+            LIEF_API friend std::ostream &operator<<(std::ostream &os, const Section &section);
+
+        private:
+            std::string segment_name_;
+            uint64_t original_size_ = 0;
+            uint32_t align_ = 0;
+            uint32_t relocations_offset_ = 0;
+            uint32_t nbof_relocations_ = 0;
+            uint32_t flags_ = 0;
+            uint32_t reserved1_ = 0;
+            uint32_t reserved2_ = 0;
+            uint32_t reserved3_ = 0;
+            content_t content_;
+            SegmentCommand *segment_ = nullptr;
+            relocations_t relocations_;
+        };
+
+        LIEF_API const char *to_string(Section::TYPE type);
+
+        LIEF_API const char *to_string(Section::FLAGS flag);
+
+    }
 }
 
 ENABLE_BITMASK_OPERATORS(LIEF::MachO::Section::FLAGS)

@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_SEGMENT_SPLIT_INFO_H
 #define LIEF_MACHO_SEGMENT_SPLIT_INFO_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -23,68 +24,75 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
-class BinaryParser;
-class LinkEdit;
+    namespace MachO {
+        class BinaryParser;
 
-namespace details {
-struct linkedit_data_command;
-}
+        class LinkEdit;
+
+        namespace details {
+            struct linkedit_data_command;
+        }
 
 /// Class that represents the LoadCommand::TYPE::SEGMENT_SPLIT_INFO command
-class LIEF_API SegmentSplitInfo : public LoadCommand {
-  friend class BinaryParser;
-  friend class LinkEdit;
-  public:
-  SegmentSplitInfo() = default;
-  SegmentSplitInfo(const details::linkedit_data_command& cmd);
+        class LIEF_API SegmentSplitInfo : public LoadCommand {
+            friend class BinaryParser;
 
-  SegmentSplitInfo& operator=(const SegmentSplitInfo& copy) = default;
-  SegmentSplitInfo(const SegmentSplitInfo& copy) = default;
+            friend class LinkEdit;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<SegmentSplitInfo>(new SegmentSplitInfo(*this));
-  }
+        public:
+            SegmentSplitInfo() = default;
 
-  uint32_t data_offset() const {
-    return data_offset_;
-  }
-  uint32_t data_size() const {
-    return data_size_;
-  }
+            SegmentSplitInfo(const details::linkedit_data_command &cmd);
 
-  void data_offset(uint32_t offset) {
-    data_offset_ = offset;
-  }
-  void data_size(uint32_t size) {
-    data_size_ = size;
-  }
+            SegmentSplitInfo &operator=(const SegmentSplitInfo &copy) = default;
 
-  span<uint8_t> content() {
-    return content_;
-  }
+            SegmentSplitInfo(const SegmentSplitInfo &copy) = default;
 
-  span<const uint8_t> content() const {
-    return content_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<SegmentSplitInfo>(new SegmentSplitInfo(*this));
+            }
 
-  ~SegmentSplitInfo() override = default;
+            uint32_t data_offset() const {
+                return data_offset_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            uint32_t data_size() const {
+                return data_size_;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            void data_offset(uint32_t offset) {
+                data_offset_ = offset;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::SEGMENT_SPLIT_INFO;
-  }
+            void data_size(uint32_t size) {
+                data_size_ = size;
+            }
 
-  private:
-  uint32_t data_offset_ = 0;
-  uint32_t data_size_   = 0;
-  span<uint8_t> content_;
+            span<uint8_t> content() {
+                return content_;
+            }
 
-};
+            span<const uint8_t> content() const {
+                return content_;
+            }
 
-}
+            ~SegmentSplitInfo() override = default;
+
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::SEGMENT_SPLIT_INFO;
+            }
+
+        private:
+            uint32_t data_offset_ = 0;
+            uint32_t data_size_ = 0;
+            span<uint8_t> content_;
+
+        };
+
+    }
 }
 #endif

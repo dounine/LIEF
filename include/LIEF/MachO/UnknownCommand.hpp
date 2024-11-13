@@ -14,6 +14,7 @@
  */
 #ifndef LIEF_MACHO_UNKNOWN_COMMAND_H
 #define LIEF_MACHO_UNKNOWN_COMMAND_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -21,51 +22,52 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct load_command;
-}
+        namespace details {
+            struct load_command;
+        }
 
 
 /// Generic class when the command is not recognized by LIEF
-class LIEF_API UnknownCommand : public LoadCommand {
+        class LIEF_API UnknownCommand : public LoadCommand {
 
-  public:
-  UnknownCommand() = delete;
-  UnknownCommand(const details::load_command& command) :
-    LoadCommand(command),
-    original_command_(static_cast<uint64_t>(command_))
-  {
-    command_ = LoadCommand::TYPE::LIEF_UNKNOWN;
-  }
+        public:
+            UnknownCommand() = delete;
 
-  UnknownCommand& operator=(const UnknownCommand& copy) = default;
-  UnknownCommand(const UnknownCommand& copy) = default;
+            UnknownCommand(const details::load_command &command) :
+                    LoadCommand(command),
+                    original_command_(static_cast<uint64_t>(command_)) {
+                command_ = LoadCommand::TYPE::LIEF_UNKNOWN;
+            }
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<UnknownCommand>(new UnknownCommand(*this));
-  }
+            UnknownCommand &operator=(const UnknownCommand &copy) = default;
 
-  ~UnknownCommand() override = default;
+            UnknownCommand(const UnknownCommand &copy) = default;
 
-  /// The original `LC_` int that is not supported by LIEF
-  uint64_t original_command() const {
-    return original_command_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<UnknownCommand>(new UnknownCommand(*this));
+            }
 
-  void accept(Visitor& visitor) const override;
+            ~UnknownCommand() override = default;
 
-  std::ostream& print(std::ostream& os) const override;
+            /// The original `LC_` int that is not supported by LIEF
+            uint64_t original_command() const {
+                return original_command_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::LIEF_UNKNOWN;
-  }
+            void accept(Visitor &visitor) const override;
 
-  private:
-  uint64_t original_command_ = 0;
-};
+            std::ostream &print(std::ostream &os) const override;
 
-}
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::LIEF_UNKNOWN;
+            }
+
+        private:
+            uint64_t original_command_ = 0;
+        };
+
+    }
 }
 #endif

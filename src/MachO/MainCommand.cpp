@@ -20,32 +20,30 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-MainCommand::MainCommand(const details::entry_point_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
-  entrypoint_{cmd.entryoff},
-  stack_size_{cmd.stacksize}
-{}
+        MainCommand::MainCommand(const details::entry_point_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
+                entrypoint_{cmd.entryoff},
+                stack_size_{cmd.stacksize} {}
 
-MainCommand::MainCommand(uint64_t entrypoint, uint64_t stacksize) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE::MAIN, sizeof(details::entry_point_command)},
-  entrypoint_{entrypoint},
-  stack_size_{stacksize}
-{
-  this->data(LoadCommand::raw_t(size(), 0));
-}
+        MainCommand::MainCommand(uint64_t entrypoint, uint64_t stacksize) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE::MAIN, sizeof(details::entry_point_command)},
+                entrypoint_{entrypoint},
+                stack_size_{stacksize} {
+            this->data(LoadCommand::raw_t(size(), 0));
+        }
 
-void MainCommand::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void MainCommand::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& MainCommand::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << fmt::format("entrypoint=0x{:x}, stack size=0x{:x}",
-                    entrypoint(), stack_size());
-  return os;
-}
+        std::ostream &MainCommand::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << fmt::format("entrypoint=0x{:x}, stack size=0x{:x}",
+                              entrypoint(), stack_size());
+            return os;
+        }
 
-}
+    }
 }

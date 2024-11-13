@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_DYLINKER_COMMAND_H
 #define LIEF_MACHO_DYLINKER_COMMAND_H
+
 #include <string>
 #include <ostream>
 
@@ -23,52 +24,55 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-namespace details {
-struct dylinker_command;
-}
+        namespace details {
+            struct dylinker_command;
+        }
 
 /// Class that represents the Mach-O linker, also named loader.
 /// Most of the time, DylinkerCommand::name() should return ``/usr/lib/dyld``
-class LIEF_API DylinkerCommand : public LoadCommand {
-  public:
-  DylinkerCommand() = default;
-  DylinkerCommand(const details::dylinker_command& cmd);
-  DylinkerCommand(std::string name);
+        class LIEF_API DylinkerCommand : public LoadCommand {
+        public:
+            DylinkerCommand() = default;
 
-  DylinkerCommand& operator=(const DylinkerCommand& copy) = default;
-  DylinkerCommand(const DylinkerCommand& copy) = default;
+            DylinkerCommand(const details::dylinker_command &cmd);
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<DylinkerCommand>(new DylinkerCommand(*this));
-  }
+            DylinkerCommand(std::string name);
 
-  ~DylinkerCommand() override = default;
+            DylinkerCommand &operator=(const DylinkerCommand &copy) = default;
 
-  std::ostream& print(std::ostream& os) const override;
+            DylinkerCommand(const DylinkerCommand &copy) = default;
 
-  /// Path to the linker (or loader)
-  const std::string& name() const {
-    return name_;
-  }
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<DylinkerCommand>(new DylinkerCommand(*this));
+            }
 
-  void name(std::string name) {
-    name_ = std::move(name);
-  }
+            ~DylinkerCommand() override = default;
 
-  void accept(Visitor& visitor) const override;
+            std::ostream &print(std::ostream &os) const override;
 
-  static bool classof(const LoadCommand* cmd) {
-    const LoadCommand::TYPE type = cmd->command();
-    return type == LoadCommand::TYPE::ID_DYLINKER ||
-           type == LoadCommand::TYPE::LOAD_DYLINKER;
-  }
+            /// Path to the linker (or loader)
+            const std::string &name() const {
+                return name_;
+            }
 
-  private:
-  std::string name_;
-};
+            void name(std::string name) {
+                name_ = std::move(name);
+            }
 
-}
+            void accept(Visitor &visitor) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                const LoadCommand::TYPE type = cmd->command();
+                return type == LoadCommand::TYPE::ID_DYLINKER ||
+                       type == LoadCommand::TYPE::LOAD_DYLINKER;
+            }
+
+        private:
+            std::string name_;
+        };
+
+    }
 }
 #endif

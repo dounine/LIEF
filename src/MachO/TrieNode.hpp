@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_TRIE_NODE_H_
 #define LIEF_MACHO_TRIE_NODE_H_
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -22,67 +23,69 @@
 #include "LIEF/visibility.h"
 
 namespace LIEF {
-class vector_iostream;
-namespace MachO {
-class TrieNode;
-class ExportInfo;
+    class vector_iostream;
+    namespace MachO {
+        class TrieNode;
 
-class LIEF_LOCAL TrieEdge {
-  public:
-  static std::unique_ptr<TrieEdge> create(const std::string& str, TrieNode& node) {
-    return std::make_unique<TrieEdge>(str, node);
-  }
+        class ExportInfo;
 
-  TrieEdge() = delete;
-  TrieEdge(std::string str, TrieNode& node) :
-    substr(std::move(str)),
-    child(&node)
-  {}
+        class LIEF_LOCAL TrieEdge {
+        public:
+            static std::unique_ptr<TrieEdge> create(const std::string &str, TrieNode &node) {
+                return std::make_unique<TrieEdge>(str, node);
+            }
 
-  ~TrieEdge() = default;
+            TrieEdge() = delete;
 
-  public:
-  std::string substr;
-  TrieNode* child = nullptr;
-};
+            TrieEdge(std::string str, TrieNode &node) :
+                    substr(std::move(str)),
+                    child(&node) {}
+
+            ~TrieEdge() = default;
+
+        public:
+            std::string substr;
+            TrieNode *child = nullptr;
+        };
 
 
-class LIEF_LOCAL TrieNode {
-  public:
-  using trie_edge_list_t = std::vector<std::unique_ptr<TrieEdge>>;
-  using node_list_t = std::vector<std::unique_ptr<TrieNode>>;
+        class LIEF_LOCAL TrieNode {
+        public:
+            using trie_edge_list_t = std::vector<std::unique_ptr<TrieEdge>>;
+            using node_list_t = std::vector<std::unique_ptr<TrieNode>>;
 
-  static std::unique_ptr<TrieNode> create(std::string str) {
-    return std::make_unique<TrieNode>(std::move(str));
-  }
+            static std::unique_ptr<TrieNode> create(std::string str) {
+                return std::make_unique<TrieNode>(std::move(str));
+            }
 
-  TrieNode() = delete;
+            TrieNode() = delete;
 
-  TrieNode(std::string str) :
-    cummulative_string_(std::move(str))
-  {}
+            TrieNode(std::string str) :
+                    cummulative_string_(std::move(str)) {}
 
-  ~TrieNode() = default;
+            ~TrieNode() = default;
 
-  TrieNode& add_symbol(const ExportInfo& info, node_list_t& nodes);
-  TrieNode& add_ordered_nodes(const ExportInfo& info, std::vector<TrieNode*>& nodes);
-  bool update_offset(uint32_t& offset);
+            TrieNode &add_symbol(const ExportInfo &info, node_list_t &nodes);
 
-  TrieNode& write(vector_iostream& buffer);
+            TrieNode &add_ordered_nodes(const ExportInfo &info, std::vector<TrieNode *> &nodes);
 
-  private:
-  std::string cummulative_string_;
-  trie_edge_list_t children_;
-  uint64_t address_ = 0;
-  uint64_t flags_ = 0;
-  uint64_t other_ = 0;
-  std::string imported_name_;
-  uint32_t trie_offset_ = 0;
-  bool has_export_info_ = false;
-  bool ordered_ = false;
-};
+            bool update_offset(uint32_t &offset);
 
-}
+            TrieNode &write(vector_iostream &buffer);
+
+        private:
+            std::string cummulative_string_;
+            trie_edge_list_t children_;
+            uint64_t address_ = 0;
+            uint64_t flags_ = 0;
+            uint64_t other_ = 0;
+            std::string imported_name_;
+            uint32_t trie_offset_ = 0;
+            bool has_export_info_ = false;
+            bool ordered_ = false;
+        };
+
+    }
 }
 
 #endif

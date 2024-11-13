@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_RELOCATION_DYLD_COMMAND_H
 #define LIEF_MACHO_RELOCATION_DYLD_COMMAND_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -22,71 +23,75 @@
 #include "LIEF/MachO/Relocation.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
+        class BinaryParser;
 
 /// Class that represents a relocation found in the DyldInfo structure.
 ///
 /// While this class does not have an associated structure in the Mach-O format specification,
 /// it provides a convenient interface for the Dyld::rebase
-class LIEF_API RelocationDyld : public Relocation {
+        class LIEF_API RelocationDyld : public Relocation {
 
-  friend class BinaryParser;
+            friend class BinaryParser;
 
-  public:
-  using Relocation::Relocation;
-  using LIEF::Relocation::operator<;
-  using LIEF::Relocation::operator<=;
-  using LIEF::Relocation::operator>;
-  using LIEF::Relocation::operator>=;
-  RelocationDyld() = default;
+        public:
+            using Relocation::Relocation;
+            using LIEF::Relocation::operator<;
+            using LIEF::Relocation::operator<=;
+            using LIEF::Relocation::operator>;
+            using LIEF::Relocation::operator>=;
 
-  RelocationDyld& operator=(const RelocationDyld&) = default;
-  RelocationDyld(const RelocationDyld&) = default;
+            RelocationDyld() = default;
 
-  ~RelocationDyld() override = default;
+            RelocationDyld &operator=(const RelocationDyld &) = default;
 
-  std::unique_ptr<Relocation> clone() const override {
-    return std::unique_ptr<RelocationDyld>(new RelocationDyld(*this));
-  }
+            RelocationDyld(const RelocationDyld &) = default;
 
-  /// Indicates whether the item containing the address to be
-  /// relocated is part of a CPU instruction that uses PC-relative addressing.
-  ///
-  /// For addresses contained in PC-relative instructions, the CPU adds the address of
-  /// the instruction to the address contained in the instruction.
-  bool is_pc_relative() const override;
+            ~RelocationDyld() override = default;
 
-  /// Origin of the relocation. For this concrete object, it
-  /// should be Relocation::ORIGIN::DYLDINFO
-  ORIGIN origin() const override {
-    return ORIGIN::DYLDINFO;
-  }
+            std::unique_ptr<Relocation> clone() const override {
+                return std::unique_ptr<RelocationDyld>(new RelocationDyld(*this));
+            }
 
-  void pc_relative(bool val) override;
+            /// Indicates whether the item containing the address to be
+            /// relocated is part of a CPU instruction that uses PC-relative addressing.
+            ///
+            /// For addresses contained in PC-relative instructions, the CPU adds the address of
+            /// the instruction to the address contained in the instruction.
+            bool is_pc_relative() const override;
 
-  bool operator<(const RelocationDyld& rhs) const;
-  bool operator>=(const RelocationDyld& rhs) const {
-    return !(*this < rhs);
-  }
+            /// Origin of the relocation. For this concrete object, it
+            /// should be Relocation::ORIGIN::DYLDINFO
+            ORIGIN origin() const override {
+                return ORIGIN::DYLDINFO;
+            }
 
-  bool operator>(const RelocationDyld& rhs) const;
-  bool operator<=(const RelocationDyld& rhs) const {
-    return !(*this > rhs);
-  }
+            void pc_relative(bool val) override;
 
-  void accept(Visitor& visitor) const override;
+            bool operator<(const RelocationDyld &rhs) const;
 
-  static bool classof(const Relocation& r) {
-    return r.origin() == Relocation::ORIGIN::DYLDINFO;
-  }
+            bool operator>=(const RelocationDyld &rhs) const {
+                return !(*this < rhs);
+            }
 
-  std::ostream& print(std::ostream& os) const override {
-    return Relocation::print(os);
-  }
-};
+            bool operator>(const RelocationDyld &rhs) const;
 
-}
+            bool operator<=(const RelocationDyld &rhs) const {
+                return !(*this > rhs);
+            }
+
+            void accept(Visitor &visitor) const override;
+
+            static bool classof(const Relocation &r) {
+                return r.origin() == Relocation::ORIGIN::DYLDINFO;
+            }
+
+            std::ostream &print(std::ostream &os) const override {
+                return Relocation::print(os);
+            }
+        };
+
+    }
 }
 #endif

@@ -20,29 +20,28 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-FunctionStarts::FunctionStarts(const details::linkedit_data_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
-  data_offset_{cmd.dataoff},
-  data_size_{cmd.datasize}
-{}
+        FunctionStarts::FunctionStarts(const details::linkedit_data_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
+                data_offset_{cmd.dataoff},
+                data_size_{cmd.datasize} {}
 
-void FunctionStarts::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void FunctionStarts::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& FunctionStarts::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  const std::vector<uint64_t> funcs = functions();
-  os << fmt::format("offset=0x{:06}, size=0x{:06x}, #functions={}",
-                     data_offset(), data_size(), funcs.size()) << '\n';
-  for (size_t i = 0; i < funcs.size(); ++i) {
-    os << fmt::format("  [{}] __TEXT + 0x{:06x}\n", i, funcs[i]);
-  }
-  return os;
-}
+        std::ostream &FunctionStarts::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            const std::vector<uint64_t> funcs = functions();
+            os << fmt::format("offset=0x{:06}, size=0x{:06x}, #functions={}",
+                              data_offset(), data_size(), funcs.size()) << '\n';
+            for (size_t i = 0; i < funcs.size(); ++i) {
+                os << fmt::format("  [{}] __TEXT + 0x{:06x}\n", i, funcs[i]);
+            }
+            return os;
+        }
 
 
-}
+    }
 }

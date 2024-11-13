@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_CHAINED_BINDING_INFO_H
 #define LIEF_MACHO_CHAINED_BINDING_INFO_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -22,21 +23,25 @@
 #include "LIEF/MachO/DyldChainedFormat.hpp"
 
 namespace LIEF {
-namespace MachO {
-class BinaryParser;
-class Builder;
-class DyldChainedFixupsCreator;
-class ChainedBindingInfoList;
-class Symbol;
+    namespace MachO {
+        class BinaryParser;
 
-namespace details {
-struct dyld_chained_ptr_arm64e_bind;
-struct dyld_chained_ptr_arm64e_auth_bind;
-struct dyld_chained_ptr_arm64e_bind24;
-struct dyld_chained_ptr_arm64e_auth_bind24;
-struct dyld_chained_ptr_64_bind;
-struct dyld_chained_ptr_32_bind;
-}
+        class Builder;
+
+        class DyldChainedFixupsCreator;
+
+        class ChainedBindingInfoList;
+
+        class Symbol;
+
+        namespace details {
+            struct dyld_chained_ptr_arm64e_bind;
+            struct dyld_chained_ptr_arm64e_auth_bind;
+            struct dyld_chained_ptr_arm64e_bind24;
+            struct dyld_chained_ptr_arm64e_auth_bind24;
+            struct dyld_chained_ptr_64_bind;
+            struct dyld_chained_ptr_32_bind;
+        }
 
 /// This class represents a symbol binding operation associated with
 /// the LC_DYLD_CHAINED_FIXUPS command.
@@ -45,110 +50,122 @@ struct dyld_chained_ptr_32_bind;
 /// specifications but it provides a *view* on an entry.
 ///
 /// @see: BindingInfo
-class LIEF_API ChainedBindingInfo : public BindingInfo {
+        class LIEF_API ChainedBindingInfo : public BindingInfo {
 
-  friend class BinaryParser;
-  friend class Builder;
-  friend class DyldChainedFixupsCreator;
-  friend class ChainedBindingInfoList;
+            friend class BinaryParser;
 
-  public:
-  ChainedBindingInfo() = delete;
-  explicit ChainedBindingInfo(DYLD_CHAINED_FORMAT fmt, bool is_weak);
+            friend class Builder;
 
-  ChainedBindingInfo& operator=(ChainedBindingInfo other);
-  ChainedBindingInfo(const ChainedBindingInfo& other);
-  ChainedBindingInfo(ChainedBindingInfo&&) noexcept;
+            friend class DyldChainedFixupsCreator;
 
-  void swap(ChainedBindingInfo& other) noexcept;
+            friend class ChainedBindingInfoList;
 
-  /// Format of the imports
-  DYLD_CHAINED_FORMAT format() const {
-    return format_;
-  }
+        public:
+            ChainedBindingInfo() = delete;
 
-  /// Format of the pointer
-  DYLD_CHAINED_PTR_FORMAT ptr_format() const {
-    return ptr_format_;
-  }
+            explicit ChainedBindingInfo(DYLD_CHAINED_FORMAT fmt, bool is_weak);
 
-  /// Original offset in the chain of this binding
-  uint32_t offset() const {
-    return offset_;
-  }
+            ChainedBindingInfo &operator=(ChainedBindingInfo other);
 
-  void offset(uint32_t offset) {
-    offset_ = offset;
-  }
+            ChainedBindingInfo(const ChainedBindingInfo &other);
 
-  uint64_t address() const override {
-    return address_;
-  }
+            ChainedBindingInfo(ChainedBindingInfo &&) noexcept;
 
-  void address(uint64_t address) override {
-    address_ = address;
-  }
+            void swap(ChainedBindingInfo &other) noexcept;
 
-  uint64_t sign_extended_addend() const;
+            /// Format of the imports
+            DYLD_CHAINED_FORMAT format() const {
+                return format_;
+            }
 
-  TYPES type() const override {
-    return TYPES::CHAINED;
-  }
+            /// Format of the pointer
+            DYLD_CHAINED_PTR_FORMAT ptr_format() const {
+                return ptr_format_;
+            }
 
-  static bool classof(const BindingInfo* info) {
-    return info->type() == TYPES::CHAINED;
-  }
+            /// Original offset in the chain of this binding
+            uint32_t offset() const {
+                return offset_;
+            }
 
-  ~ChainedBindingInfo() override {
-    clear();
-  }
+            void offset(uint32_t offset) {
+                offset_ = offset;
+            }
 
-  void accept(Visitor& visitor) const override;
+            uint64_t address() const override {
+                return address_;
+            }
 
-  LIEF_API friend
-  std::ostream& operator<<(std::ostream& os, const ChainedBindingInfo& info) {
-    os << static_cast<const BindingInfo&>(info);
-    return os;
-  }
+            void address(uint64_t address) override {
+                address_ = address;
+            }
 
-  protected:
-  void clear();
-  enum class BIND_TYPES {
-    UNKNOWN = 0,
+            uint64_t sign_extended_addend() const;
 
-    ARM64E_BIND,
-    ARM64E_AUTH_BIND,
+            TYPES type() const override {
+                return TYPES::CHAINED;
+            }
 
-    ARM64E_BIND24,
-    ARM64E_AUTH_BIND24,
+            static bool classof(const BindingInfo *info) {
+                return info->type() == TYPES::CHAINED;
+            }
 
-    PTR64_BIND,
-    PTR32_BIND,
-  };
+            ~ChainedBindingInfo() override {
+                clear();
+            }
 
-  void set(const details::dyld_chained_ptr_arm64e_bind& bind);
-  void set(const details::dyld_chained_ptr_arm64e_auth_bind& bind);
-  void set(const details::dyld_chained_ptr_arm64e_bind24& bind);
-  void set(const details::dyld_chained_ptr_arm64e_auth_bind24& bind);
-  void set(const details::dyld_chained_ptr_64_bind& bind);
-  void set(const details::dyld_chained_ptr_32_bind& bind);
+            void accept(Visitor &visitor) const override;
 
-  DYLD_CHAINED_FORMAT format_;
-  DYLD_CHAINED_PTR_FORMAT ptr_format_;
-  uint32_t offset_ = 0;
+            LIEF_API friend
+            std::ostream &operator<<(std::ostream &os, const ChainedBindingInfo &info) {
+                os << static_cast<const BindingInfo &>(info);
+                return os;
+            }
 
-  BIND_TYPES btypes_ = BIND_TYPES::UNKNOWN;
+        protected:
+            void clear();
 
-  union {
-    details::dyld_chained_ptr_arm64e_bind*        arm64_bind_ = nullptr;
-    details::dyld_chained_ptr_arm64e_auth_bind*   arm64_auth_bind_;
-    details::dyld_chained_ptr_arm64e_bind24*      arm64_bind24_;
-    details::dyld_chained_ptr_arm64e_auth_bind24* arm64_auth_bind24_;
-    details::dyld_chained_ptr_64_bind*            p64_bind_;
-    details::dyld_chained_ptr_32_bind*            p32_bind_;
-  };
-};
+            enum class BIND_TYPES {
+                UNKNOWN = 0,
 
-}
+                ARM64E_BIND,
+                ARM64E_AUTH_BIND,
+
+                ARM64E_BIND24,
+                ARM64E_AUTH_BIND24,
+
+                PTR64_BIND,
+                PTR32_BIND,
+            };
+
+            void set(const details::dyld_chained_ptr_arm64e_bind &bind);
+
+            void set(const details::dyld_chained_ptr_arm64e_auth_bind &bind);
+
+            void set(const details::dyld_chained_ptr_arm64e_bind24 &bind);
+
+            void set(const details::dyld_chained_ptr_arm64e_auth_bind24 &bind);
+
+            void set(const details::dyld_chained_ptr_64_bind &bind);
+
+            void set(const details::dyld_chained_ptr_32_bind &bind);
+
+            DYLD_CHAINED_FORMAT format_;
+            DYLD_CHAINED_PTR_FORMAT ptr_format_;
+            uint32_t offset_ = 0;
+
+            BIND_TYPES btypes_ = BIND_TYPES::UNKNOWN;
+
+            union {
+                details::dyld_chained_ptr_arm64e_bind *arm64_bind_ = nullptr;
+                details::dyld_chained_ptr_arm64e_auth_bind *arm64_auth_bind_;
+                details::dyld_chained_ptr_arm64e_bind24 *arm64_bind24_;
+                details::dyld_chained_ptr_arm64e_auth_bind24 *arm64_auth_bind24_;
+                details::dyld_chained_ptr_64_bind *p64_bind_;
+                details::dyld_chained_ptr_32_bind *p32_bind_;
+            };
+        };
+
+    }
 }
 #endif

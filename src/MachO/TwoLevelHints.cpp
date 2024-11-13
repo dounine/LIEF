@@ -19,23 +19,22 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-TwoLevelHints::TwoLevelHints(const details::twolevel_hints_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
-  offset_{cmd.offset},
-  original_nb_hints_{cmd.nhints}
-{}
+        TwoLevelHints::TwoLevelHints(const details::twolevel_hints_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize},
+                offset_{cmd.offset},
+                original_nb_hints_{cmd.nhints} {}
 
-void TwoLevelHints::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void TwoLevelHints::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& TwoLevelHints::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  return os;
-}
+        std::ostream &TwoLevelHints::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            return os;
+        }
 
 
-}
+    }
 }

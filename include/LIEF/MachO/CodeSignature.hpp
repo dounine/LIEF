@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_CODE_SIGNATURE_COMMAND_H
 #define LIEF_MACHO_CODE_SIGNATURE_COMMAND_H
+
 #include <ostream>
 #include <cstdint>
 
@@ -24,74 +25,81 @@
 #include "LIEF/MachO/LoadCommand.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
-class Builder;
-class LinkEdit;
+        class BinaryParser;
 
-namespace details {
-struct linkedit_data_command;
-}
+        class Builder;
 
-class LIEF_API CodeSignature : public LoadCommand {
-  friend class BinaryParser;
-  friend class Builder;
-  friend class LinkEdit;
+        class LinkEdit;
 
-  public:
-  CodeSignature() = default;
-  CodeSignature(const details::linkedit_data_command& cmd);
+        namespace details {
+            struct linkedit_data_command;
+        }
 
-  CodeSignature& operator=(const CodeSignature& copy) = default;
-  CodeSignature(const CodeSignature& copy) = default;
+        class LIEF_API CodeSignature : public LoadCommand {
+            friend class BinaryParser;
 
-  std::unique_ptr<LoadCommand> clone() const override {
-    return std::unique_ptr<CodeSignature>(new CodeSignature(*this));
-  }
+            friend class Builder;
 
-  /// Offset in the binary where the signature starts
-  uint32_t data_offset() const {
-    return data_offset_;
-  }
+            friend class LinkEdit;
 
-  /// Size of the raw signature
-  uint32_t data_size() const {
-    return data_size_;
-  }
+        public:
+            CodeSignature() = default;
 
-  void data_offset(uint32_t offset) {
-    data_offset_ = offset;
-  }
-  void data_size(uint32_t size) {
-    data_size_ = size;
-  }
+            CodeSignature(const details::linkedit_data_command &cmd);
 
-  span<uint8_t> content() {
-    return content_;
-  }
+            CodeSignature &operator=(const CodeSignature &copy) = default;
 
-  span<const uint8_t> content() const {
-    return content_;
-  }
+            CodeSignature(const CodeSignature &copy) = default;
 
-  ~CodeSignature() override = default;
+            std::unique_ptr<LoadCommand> clone() const override {
+                return std::unique_ptr<CodeSignature>(new CodeSignature(*this));
+            }
 
-  void accept(Visitor& visitor) const override;
+            /// Offset in the binary where the signature starts
+            uint32_t data_offset() const {
+                return data_offset_;
+            }
 
-  std::ostream& print(std::ostream& os) const override;
+            /// Size of the raw signature
+            uint32_t data_size() const {
+                return data_size_;
+            }
 
-  static bool classof(const LoadCommand* cmd) {
-    return cmd->command() == LoadCommand::TYPE::CODE_SIGNATURE;
-  }
+            void data_offset(uint32_t offset) {
+                data_offset_ = offset;
+            }
 
-  private:
-  uint32_t data_offset_ = 0;
-  uint32_t data_size_ = 0;
-  span<uint8_t> content_;
+            void data_size(uint32_t size) {
+                data_size_ = size;
+            }
 
-};
+            span<uint8_t> content() {
+                return content_;
+            }
 
-}
+            span<const uint8_t> content() const {
+                return content_;
+            }
+
+            ~CodeSignature() override = default;
+
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override;
+
+            static bool classof(const LoadCommand *cmd) {
+                return cmd->command() == LoadCommand::TYPE::CODE_SIGNATURE;
+            }
+
+        private:
+            uint32_t data_offset_ = 0;
+            uint32_t data_size_ = 0;
+            span<uint8_t> content_;
+
+        };
+
+    }
 }
 #endif

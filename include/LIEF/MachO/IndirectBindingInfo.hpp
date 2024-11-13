@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_INDIRECT_BINDING_INFO_H
 #define LIEF_MACHO_INDIRECT_BINDING_INFO_H
+
 #include <ostream>
 #include <cstdint>
 
@@ -22,47 +23,48 @@
 #include "LIEF/MachO/BindingInfo.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
 /// This class represents a binding operation infered from the indirect symbol
 /// table.
-class LIEF_API IndirectBindingInfo : public BindingInfo {
-  friend class BinaryParser;
-  public:
+        class LIEF_API IndirectBindingInfo : public BindingInfo {
+            friend class BinaryParser;
 
-  IndirectBindingInfo(SegmentCommand& segment, Symbol& symbol, int32_t ordinal,
-                      DylibCommand* dylib, uint64_t address)
-  {
-    segment_ = &segment;
-    symbol_ = &symbol;
-    library_ordinal_ = ordinal;
-    library_ = dylib;
-    address_ = address;
-  }
+        public:
 
-  IndirectBindingInfo& operator=(const IndirectBindingInfo& other) = default;
-  IndirectBindingInfo(const IndirectBindingInfo& other) = default;
+            IndirectBindingInfo(SegmentCommand &segment, Symbol &symbol, int32_t ordinal,
+                                DylibCommand *dylib, uint64_t address) {
+                segment_ = &segment;
+                symbol_ = &symbol;
+                library_ordinal_ = ordinal;
+                library_ = dylib;
+                address_ = address;
+            }
 
-  IndirectBindingInfo(IndirectBindingInfo&&) noexcept = default;
+            IndirectBindingInfo &operator=(const IndirectBindingInfo &other) = default;
+
+            IndirectBindingInfo(const IndirectBindingInfo &other) = default;
+
+            IndirectBindingInfo(IndirectBindingInfo &&) noexcept = default;
 
 
-  BindingInfo::TYPES type() const override {
-    return BindingInfo::TYPES::INDIRECT_SYMBOL;
-  }
+            BindingInfo::TYPES type() const override {
+                return BindingInfo::TYPES::INDIRECT_SYMBOL;
+            }
 
-  static bool classof(const BindingInfo* info) {
-    return info->type() == BindingInfo::TYPES::INDIRECT_SYMBOL;
-  }
+            static bool classof(const BindingInfo *info) {
+                return info->type() == BindingInfo::TYPES::INDIRECT_SYMBOL;
+            }
 
-  ~IndirectBindingInfo() override = default;
+            ~IndirectBindingInfo() override = default;
 
-  LIEF_API friend
-  std::ostream& operator<<(std::ostream& os, const IndirectBindingInfo& info) {
-    os << static_cast<const BindingInfo&>(info);
-    return os;
-  }
-};
+            LIEF_API friend
+            std::ostream &operator<<(std::ostream &os, const IndirectBindingInfo &info) {
+                os << static_cast<const BindingInfo &>(info);
+                return os;
+            }
+        };
 
-}
+    }
 }
 #endif

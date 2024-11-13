@@ -19,22 +19,21 @@
 #include "MachO/Structures.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-SubClient::SubClient(const details::sub_client_command& cmd) :
-  LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize}
-{}
+        SubClient::SubClient(const details::sub_client_command &cmd) :
+                LoadCommand::LoadCommand{LoadCommand::TYPE(cmd.cmd), cmd.cmdsize} {}
 
-void SubClient::accept(Visitor& visitor) const {
-  visitor.visit(*this);
-}
+        void SubClient::accept(Visitor &visitor) const {
+            visitor.visit(*this);
+        }
 
-std::ostream& SubClient::print(std::ostream& os) const {
-  LoadCommand::print(os);
-  os << "client: " << client();
-  return os;
-}
+        std::ostream &SubClient::print(std::ostream &os) const {
+            LoadCommand::print(os);
+            os << "client: " << client();
+            return os;
+        }
 
 
-}
+    }
 }

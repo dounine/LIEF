@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_BINDING_INFO_H
 #define LIEF_MACHO_BINDING_INFO_H
+
 #include <ostream>
 #include <cstdint>
 
@@ -22,12 +23,16 @@
 #include "LIEF/Object.hpp"
 
 namespace LIEF {
-namespace MachO {
-class DylibCommand;
-class SegmentCommand;
-class Symbol;
-class BinaryParser;
-class DyldChainedFixupsCreator;
+    namespace MachO {
+        class DylibCommand;
+
+        class SegmentCommand;
+
+        class Symbol;
+
+        class BinaryParser;
+
+        class DyldChainedFixupsCreator;
 
 /// Class that provides an interface over a *binding* operation.
 ///
@@ -36,134 +41,140 @@ class DyldChainedFixupsCreator;
 /// by the Dyld binding bytecode (`LC_DYLD_INFO`) or the Dyld chained fixups (`DYLD_CHAINED_FIXUPS`)
 ///
 /// See: LIEF::MachO::ChainedBindingInfo, LIEF::MachO::DyldBindingInfo
-class LIEF_API BindingInfo : public Object {
+        class LIEF_API BindingInfo : public Object {
 
-  friend class BinaryParser;
-  friend class DyldChainedFixupsCreator;
+            friend class BinaryParser;
 
-  public:
-  enum class TYPES {
-    UNKNOWN = 0,
-    DYLD_INFO,       /// Binding associated with the Dyld info opcodes
-    CHAINED,         /// Binding associated with the chained fixups
-    CHAINED_LIST,    /// Internal use
-    INDIRECT_SYMBOL, /// Infered from the indirect symbols table
-  };
+            friend class DyldChainedFixupsCreator;
 
-  BindingInfo() = default;
-  BindingInfo(const BindingInfo& other);
-  void swap(BindingInfo& other) noexcept;
+        public:
+            enum class TYPES {
+                UNKNOWN = 0,
+                DYLD_INFO,       /// Binding associated with the Dyld info opcodes
+                CHAINED,         /// Binding associated with the chained fixups
+                CHAINED_LIST,    /// Internal use
+                INDIRECT_SYMBOL, /// Infered from the indirect symbols table
+            };
 
-  /// Check if a MachO::SegmentCommand is associated with this binding
-  bool has_segment() const {
-    return segment_ != nullptr;
-  }
+            BindingInfo() = default;
 
-  /// The MachO::SegmentCommand associated with the BindingInfo or
-  /// a nullptr of it is not bind to a SegmentCommand
-  const SegmentCommand* segment() const {
-    return segment_;
-  }
-  SegmentCommand* segment() {
-    return segment_;
-  }
+            BindingInfo(const BindingInfo &other);
 
-  /// Check if a MachO::DylibCommand is tied with the BindingInfo
-  bool has_library() const {
-    return library_ != nullptr;
-  }
+            void swap(BindingInfo &other) noexcept;
 
-  /// MachO::DylibCommand associated with the BindingInfo or a nullptr
-  /// if not present
-  const DylibCommand* library() const {
-    return library_;
-  }
-  DylibCommand* library() {
-    return library_;
-  }
+            /// Check if a MachO::SegmentCommand is associated with this binding
+            bool has_segment() const {
+                return segment_ != nullptr;
+            }
 
-  /// Check if a MachO::Symbol is associated with the BindingInfo
-  bool has_symbol() const {
-    return symbol_ != nullptr;
-  }
+            /// The MachO::SegmentCommand associated with the BindingInfo or
+            /// a nullptr of it is not bind to a SegmentCommand
+            const SegmentCommand *segment() const {
+                return segment_;
+            }
 
-  /// MachO::Symbol associated with the BindingInfo or
-  /// a nullptr if not present
-  const Symbol* symbol() const {
-    return symbol_;
-  }
-  Symbol* symbol() {
-    return symbol_;
-  }
+            SegmentCommand *segment() {
+                return segment_;
+            }
 
-  /// Address of the binding
-  virtual uint64_t address() const {
-    return address_;
-  }
+            /// Check if a MachO::DylibCommand is tied with the BindingInfo
+            bool has_library() const {
+                return library_ != nullptr;
+            }
 
-  virtual void address(uint64_t addr) {
-    address_ = addr;
-  }
+            /// MachO::DylibCommand associated with the BindingInfo or a nullptr
+            /// if not present
+            const DylibCommand *library() const {
+                return library_;
+            }
 
-  int32_t library_ordinal() const {
-    return library_ordinal_;
-  }
+            DylibCommand *library() {
+                return library_;
+            }
 
-  void library_ordinal(int32_t ordinal) {
-    library_ordinal_ = ordinal;
-  }
+            /// Check if a MachO::Symbol is associated with the BindingInfo
+            bool has_symbol() const {
+                return symbol_ != nullptr;
+            }
 
-  /// Value added to the segment's virtual address when bound
-  int64_t addend() const {
-    return addend_;
-  }
+            /// MachO::Symbol associated with the BindingInfo or
+            /// a nullptr if not present
+            const Symbol *symbol() const {
+                return symbol_;
+            }
 
-  void addend(int64_t addend) {
-    addend_ = addend;
-  }
+            Symbol *symbol() {
+                return symbol_;
+            }
 
-  bool is_weak_import() const {
-    return is_weak_import_;
-  }
+            /// Address of the binding
+            virtual uint64_t address() const {
+                return address_;
+            }
 
-  void set_weak_import(bool val = true) {
-    is_weak_import_ = val;
-  }
+            virtual void address(uint64_t addr) {
+                address_ = addr;
+            }
 
-  /// The type of the binding. This type provides the origin
-  /// of the binding (LC_DYLD_INFO or LC_DYLD_CHAINED_FIXUPS)
-  virtual TYPES type() const = 0;
+            int32_t library_ordinal() const {
+                return library_ordinal_;
+            }
 
-  ~BindingInfo() override = default;
+            void library_ordinal(int32_t ordinal) {
+                library_ordinal_ = ordinal;
+            }
 
-  void accept(Visitor& visitor) const override;
+            /// Value added to the segment's virtual address when bound
+            int64_t addend() const {
+                return addend_;
+            }
 
-  template<class T>
-  const T* cast() const {
-    static_assert(std::is_base_of<BindingInfo, T>::value, "Require BindingInfo inheritance");
-    if (T::classof(this)) {
-      return static_cast<const T*>(this);
+            void addend(int64_t addend) {
+                addend_ = addend;
+            }
+
+            bool is_weak_import() const {
+                return is_weak_import_;
+            }
+
+            void set_weak_import(bool val = true) {
+                is_weak_import_ = val;
+            }
+
+            /// The type of the binding. This type provides the origin
+            /// of the binding (LC_DYLD_INFO or LC_DYLD_CHAINED_FIXUPS)
+            virtual TYPES type() const = 0;
+
+            ~BindingInfo() override = default;
+
+            void accept(Visitor &visitor) const override;
+
+            template<class T>
+            const T *cast() const {
+                static_assert(std::is_base_of<BindingInfo, T>::value, "Require BindingInfo inheritance");
+                if (T::classof(this)) {
+                    return static_cast<const T *>(this);
+                }
+                return nullptr;
+            }
+
+            template<class T>
+            T *cast() {
+                return const_cast<T *>(static_cast<const BindingInfo *>(this)->cast<T>());
+            }
+
+            LIEF_API friend std::ostream &operator<<(std::ostream &os, const BindingInfo &binding_info);
+
+        protected:
+            SegmentCommand *segment_ = nullptr;
+            Symbol *symbol_ = nullptr;
+            int32_t library_ordinal_ = 0;
+            int64_t addend_ = 0;
+            bool is_weak_import_ = false;
+            DylibCommand *library_ = nullptr;
+            uint64_t address_ = 0;
+        };
+
     }
-    return nullptr;
-  }
-
-  template<class T>
-  T* cast() {
-    return const_cast<T*>(static_cast<const BindingInfo*>(this)->cast<T>());
-  }
-
-  LIEF_API friend std::ostream& operator<<(std::ostream& os, const BindingInfo& binding_info);
-
-  protected:
-  SegmentCommand* segment_ = nullptr;
-  Symbol*         symbol_ = nullptr;
-  int32_t         library_ordinal_ = 0;
-  int64_t         addend_ = 0;
-  bool            is_weak_import_ = false;
-  DylibCommand*   library_ = nullptr;
-  uint64_t        address_ = 0;
-};
-
-}
 }
 #endif

@@ -15,6 +15,7 @@
  */
 #ifndef LIEF_MACHO_RELOCATION_OBJECT_COMMAND_H
 #define LIEF_MACHO_RELOCATION_OBJECT_COMMAND_H
+
 #include <ostream>
 
 #include "LIEF/visibility.h"
@@ -22,95 +23,100 @@
 #include "LIEF/MachO/Relocation.hpp"
 
 namespace LIEF {
-namespace MachO {
+    namespace MachO {
 
-class BinaryParser;
+        class BinaryParser;
 
-namespace details {
-struct relocation_info;
-struct scattered_relocation_info;
-}
+        namespace details {
+            struct relocation_info;
+            struct scattered_relocation_info;
+        }
 
 /// Class that represents a relocation presents in the MachO object
 /// file (``.o``). Usually, this kind of relocation is found in the MachO::Section
 ///
 /// @see RelocationDyld
-class LIEF_API RelocationObject : public Relocation {
+        class LIEF_API RelocationObject : public Relocation {
 
-  friend class BinaryParser;
+            friend class BinaryParser;
 
-  public:
-  using Relocation::Relocation;
-  RelocationObject() = default;
-  RelocationObject(const details::relocation_info& relocinfo);
-  RelocationObject(const details::scattered_relocation_info& scattered_relocinfo);
+        public:
+            using Relocation::Relocation;
 
-  RelocationObject& operator=(const RelocationObject& other) = default;
-  RelocationObject(const RelocationObject& other) = default;
+            RelocationObject() = default;
 
-  void swap(RelocationObject& other) noexcept;
+            RelocationObject(const details::relocation_info &relocinfo);
 
-  ~RelocationObject() override = default;
+            RelocationObject(const details::scattered_relocation_info &scattered_relocinfo);
 
-  std::unique_ptr<Relocation> clone() const override {
-    return std::unique_ptr<RelocationObject>(new RelocationObject(*this));
-  }
+            RelocationObject &operator=(const RelocationObject &other) = default;
 
-  /// Whether the relocation is PC relative
-  bool is_pc_relative() const override {
-    return is_pcrel_;
-  }
+            RelocationObject(const RelocationObject &other) = default;
 
-  /// Size of the relocation
-  size_t size() const override;
+            void swap(RelocationObject &other) noexcept;
 
-  /// Address where the relocation is applied
-  /// This address is relative to the start of the section where the relocation takes place
-  uint64_t address() const override;
+            ~RelocationObject() override = default;
 
-  /// ``true`` if the relocation is a scattered one
-  bool is_scattered() const {
-    return is_scattered_;
-  }
+            std::unique_ptr<Relocation> clone() const override {
+                return std::unique_ptr<RelocationObject>(new RelocationObject(*this));
+            }
 
-  /// For **scattered** relocations:
-  /// The address of the relocatable expression for the item in the file that needs
-  /// to be updated if the address is changed.
-  ///
-  /// For relocatable expressions with the difference of two section addresses,
-  /// the address from which to subtract (in mathematical terms, the minuend)
-  /// is contained in the first relocation entry and the address to subtract (the subtrahend)
-  /// is contained in the second relocation entry.
-  int32_t value() const;
+            /// Whether the relocation is PC relative
+            bool is_pc_relative() const override {
+                return is_pcrel_;
+            }
 
-  /// Origin of the relocation. For this object it should be Relocation::ORIGIN::RELOC_TABLE)
-  ORIGIN origin() const override {
-    return ORIGIN::RELOC_TABLE;
-  }
+            /// Size of the relocation
+            size_t size() const override;
 
-  void pc_relative(bool val) override {
-    is_pcrel_ = val;
-  }
-  void size(size_t size) override;
+            /// Address where the relocation is applied
+            /// This address is relative to the start of the section where the relocation takes place
+            uint64_t address() const override;
 
-  void value(int32_t value);
+            /// ``true`` if the relocation is a scattered one
+            bool is_scattered() const {
+                return is_scattered_;
+            }
 
-  void accept(Visitor& visitor) const override;
+            /// For **scattered** relocations:
+            /// The address of the relocatable expression for the item in the file that needs
+            /// to be updated if the address is changed.
+            ///
+            /// For relocatable expressions with the difference of two section addresses,
+            /// the address from which to subtract (in mathematical terms, the minuend)
+            /// is contained in the first relocation entry and the address to subtract (the subtrahend)
+            /// is contained in the second relocation entry.
+            int32_t value() const;
 
-  std::ostream& print(std::ostream& os) const override {
-    return Relocation::print(os);
-  }
+            /// Origin of the relocation. For this object it should be Relocation::ORIGIN::RELOC_TABLE)
+            ORIGIN origin() const override {
+                return ORIGIN::RELOC_TABLE;
+            }
 
-  static bool classof(const Relocation& r) {
-    return r.origin() == Relocation::ORIGIN::RELOC_TABLE;
-  }
+            void pc_relative(bool val) override {
+                is_pcrel_ = val;
+            }
 
-  private:
-  bool is_pcrel_ = false;
-  bool is_scattered_ = false;
-  int32_t value_ = 0;
-};
+            void size(size_t size) override;
 
-}
+            void value(int32_t value);
+
+            void accept(Visitor &visitor) const override;
+
+            std::ostream &print(std::ostream &os) const override {
+                return Relocation::print(os);
+            }
+
+            static bool classof(const Relocation &r) {
+                return r.origin() == Relocation::ORIGIN::RELOC_TABLE;
+            }
+
+        private:
+            bool is_pcrel_ = false;
+            bool is_scattered_ = false;
+            int32_t value_ = 0;
+        };
+
+    }
 }
 #endif
