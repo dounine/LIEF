@@ -20,6 +20,7 @@
 
 #include "LIEF/utils.hpp"
 #include "LIEF/BinaryStream/VectorStream.hpp"
+#include "LIEF/BinaryStream/SpanStream.hpp"
 
 #include "LIEF/ELF/hash.hpp"
 #include "LIEF/ELF/Parser.hpp"
@@ -1068,7 +1069,7 @@ ok_error_t Parser::parse_packed_relocations(uint64_t offset, uint64_t size) {
       auto reloc = std::unique_ptr<Relocation>(new Relocation(R, Relocation::PURPOSE::DYNAMIC,
         Relocation::ENCODING::ANDROID_SLEB, arch));
       bind_symbol(*reloc);
-      binary_->relocations_.push_back(std::move(reloc));
+      insert_relocation(std::move(reloc));
     }
   }
   return ok();
@@ -1115,7 +1116,7 @@ ok_error_t Parser::parse_relative_relocations(uint64_t offset, uint64_t size) {
       auto reloc = std::make_unique<Relocation>(r_offset, type,
                                                 Relocation::ENCODING::RELR);
       reloc->purpose(Relocation::PURPOSE::DYNAMIC);
-      binary_->relocations_.push_back(std::move(reloc));
+      insert_relocation(std::move(reloc));
       base = rel + sizeof(Elf_Addr);
     } else {
       for (Elf_Addr offset = base; (rel >>= 1) != 0; offset += sizeof(Elf_Addr)) {
@@ -1124,7 +1125,7 @@ ok_error_t Parser::parse_relative_relocations(uint64_t offset, uint64_t size) {
           auto reloc = std::make_unique<Relocation>(r_offset, type,
                                                     Relocation::ENCODING::RELR);
           reloc->purpose(Relocation::PURPOSE::DYNAMIC);
-          binary_->relocations_.push_back(std::move(reloc));
+          insert_relocation(std::move(reloc));
         }
       }
       base += (8 * sizeof(Elf_Relr) - 1) * sizeof(Elf_Addr);
@@ -1165,8 +1166,7 @@ ok_error_t Parser::parse_dynamic_relocations(uint64_t relocations_offset, uint64
     auto reloc = std::unique_ptr<Relocation>(new Relocation(
         std::move(*raw_reloc), Relocation::PURPOSE::DYNAMIC, enc, arch));
     bind_symbol(*reloc);
-
-    binary_->relocations_.push_back(std::move(reloc));
+    insert_relocation(std::move(reloc));
   }
   return ok();
 } // build_dynamic_reclocations
@@ -1507,7 +1507,7 @@ ok_error_t Parser::parse_pltgot_relocations(uint64_t offset, uint64_t size) {
     auto reloc = std::unique_ptr<Relocation>(new Relocation(
         std::move(*rel_hdr), Relocation::PURPOSE::PLTGOT, enc, arch));
     bind_symbol(*reloc);
-    binary_->relocations_.push_back(std::move(reloc));
+    insert_relocation(std::move(reloc));
   }
   return ok();
 }
@@ -1571,12 +1571,11 @@ ok_error_t Parser::parse_section_relocations(const Section& section) {
     symbol_table = binary_->sections_[sh_link].get();
   }
 
-  const uint64_t offset_relocations = section.file_offset();
-  const uint8_t shift = std::is_same<ELF_T, details::ELF32>::value ? 8 : 32;
+  constexpr uint8_t shift = std::is_same_v<ELF_T, details::ELF32> ? 8 : 32;
 
   const ARCH arch = binary_->header_.machine_type();
 
-  const Relocation::ENCODING enc =
+  constexpr Relocation::ENCODING enc =
     std::is_same_v<REL_T, typename ELF_T::Elf_Rel> ? Relocation::ENCODING::REL :
                                                      Relocation::ENCODING::RELA;
 
@@ -1584,20 +1583,27 @@ ok_error_t Parser::parse_section_relocations(const Section& section) {
   nb_entries = std::min<uint32_t>(nb_entries, Parser::NB_MAX_RELOCATIONS);
 
   std::unordered_set<Relocation*, RelocationSetHash, RelocationSetEq> reloc_hash;
-  stream_->setpos(offset_relocations);
-  for (uint32_t i = 0; i < nb_entries; ++i) {
-    const auto rel_hdr = stream_->read<REL_T>();
+
+  SpanStream reloc_stream(section.content());
+  const bool is_object_file =
+    binary_->header().file_type() == Header::FILE_TYPE::REL &&
+    binary_->segments_.empty();
+
+  size_t count = 0;
+  while (reloc_stream) {
+    auto rel_hdr = reloc_stream.read<REL_T>();
     if (!rel_hdr) {
+      LIEF_WARN("Can't parse relocation at offset: 0x{:04x} in {}",
+                reloc_stream.pos(), section.name());
       break;
     }
-
     auto reloc = std::unique_ptr<Relocation>(new Relocation(
-        *rel_hdr, Relocation::PURPOSE::NONE, enc, arch));
+      *rel_hdr, Relocation::PURPOSE::NONE, enc, arch));
 
     reloc->section_      = applies_to;
     reloc->symbol_table_ = symbol_table;
-    if (binary_->header().file_type() == Header::FILE_TYPE::REL &&
-        binary_->segments().size() == 0) {
+
+    if (is_object_file) {
       reloc->purpose(Relocation::PURPOSE::OBJECT);
     }
 
@@ -1617,9 +1623,11 @@ ok_error_t Parser::parse_section_relocations(const Section& section) {
     }
 
     if (reloc_hash.insert(reloc.get()).second) {
-      binary_->relocations_.push_back(std::move(reloc));
+      ++count;
+      insert_relocation(std::move(reloc));
     }
   }
+  LIEF_DEBUG("#{} relocations found in {}", count, section.name());
   return ok();
 }
 

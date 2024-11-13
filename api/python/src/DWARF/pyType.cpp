@@ -14,6 +14,7 @@ class Pointer;
 class Const;
 class Base;
 class Array;
+class Typedef;
 }
 
 namespace LIEF::dwarf::py {
@@ -35,6 +36,7 @@ void create<dw::Type>(nb::module_& m) {
     - ``DW_TAG_string_type``
     - ``DW_TAG_union_type``
     - ``DW_TAG_volatile_type``
+    - ``DW_TAG_typedef``
     - ``DW_TAG_unspecified_type``
     )doc"_doc
   );
@@ -49,6 +51,7 @@ void create<dw::Type>(nb::module_& m) {
     .value("POINTER", Type::KIND::POINTER)
     .value("STRUCT", Type::KIND::STRUCT)
     .value("UNION", Type::KIND::UNION)
+    .value("TYPEDEF", Type::KIND::TYPEDEF)
   ;
   type
     .def_prop_ro("kind", &dw::Type::kind,
@@ -62,6 +65,8 @@ void create<dw::Type>(nb::module_& m) {
         },
         R"doc(
         Return the type's name or ``None`` if it can't be resolved.
+
+        The name is resolved using either ``DW_AT_name`` or ``DW_AT_picture_string``.
         )doc"_doc
     )
 
@@ -100,6 +105,7 @@ void create<dw::Type>(nb::module_& m) {
   create<dw::types::Const>(types);
   create<dw::types::Base>(types);
   create<dw::types::Array>(types);
+  create<dw::types::Typedef>(types);
 }
 
 }

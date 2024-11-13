@@ -74,6 +74,10 @@
 
 :ELF:
 
+  * Fix issue when multiple empty strings are present in the ``.symtab`` section
+    (:pr:`1124`)
+  * Add |lief-elf-relocation-resolve| to resolve the value of relocations
+  * Add support for eBPF relocations.
   * Add support for ``GNU_PROPERTY_AARCH64_FEATURE_PAUTH`` GNU property note:
     |lief-elf-aarch64pauth|.
   * Add |lief-elf-binary-target-android| to check if an ELF targets Android
@@ -129,6 +133,12 @@
   * Fix |lief-objc-method-address| for *small* methods.
   * The output of |lief-objc-metadata-to_decl_opt| can now be configured with
     |lief-objc-declopt|.
+
+:DWARF:
+
+  * Add |lief-dwarf-function-is-external|
+  * Add |lief-dwarf-cu-imported-functions|
+  * Add ``DW_TAG_typedef`` support
 
 :Extended:
 

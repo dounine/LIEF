@@ -18,11 +18,13 @@
 #include "LIEF/DWARF/Variable.hpp"
 #include "LIEF/DWARF/Type.hpp"
 #include "LIEF/DWARF/Scope.hpp"
+
 #include "LIEF/DWARF/types/ClassLike.hpp"
 #include "LIEF/DWARF/types/Pointer.hpp"
 #include "LIEF/DWARF/types/Const.hpp"
 #include "LIEF/DWARF/types/Base.hpp"
 #include "LIEF/DWARF/types/Array.hpp"
+#include "LIEF/DWARF/types/Typedef.hpp"
 
 #include "logging.hpp"
 #include "messages.hpp"
@@ -154,6 +156,10 @@ Function::vars_it Function::variables() const {
 }
 
 bool Function::is_artificial() const {
+  return false;
+}
+
+bool Function::is_external() const {
   return false;
 }
 
@@ -317,6 +323,10 @@ CompilationUnit::Language CompilationUnit::language() const {
 }
 
 CompilationUnit::functions_it CompilationUnit::functions() const {
+  return make_empty_iterator<Function>();
+}
+
+CompilationUnit::functions_it CompilationUnit::imported_functions() const {
   return make_empty_iterator<Function>();
 }
 
@@ -538,6 +548,20 @@ Array::~Array() = default;
 const Type* Array::underlying_type() const {
   return nullptr;
 }
+
+// ----------------------------------------------------------------------------
+// DWARF/types/Typedef.hpp
+// ----------------------------------------------------------------------------
+Typedef::~Typedef() = default;
+
+const Type* Typedef::underlying_type() const {
+  return nullptr;
+}
+
+std::string Typedef::name() const {
+  return "";
+}
+
 
 } // namespace types
 

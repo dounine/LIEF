@@ -62,6 +62,18 @@
     :py:attr:`lief.Binary.debug_info`
     :cpp:func:`LIEF::Binary::debug_info`
 
+.. |lief-dwarf-function-is-external| lief-api:: lief.dwarf.Function.is_external()
+
+    :rust:method:`lief::dwarf::Function::is_external [struct]`
+    :py:attr:`lief.dwarf.Function.is_external`
+    :cpp:func:`LIEF::dwarf::Function::is_external`
+
+.. |lief-dwarf-cu-imported-functions| lief-api:: lief.dwarf.CompilationUnit.imported_functions()
+
+    :rust:method:`lief::dwarf::CompilationUnit::imported_functions [struct]`
+    :py:attr:`lief.dwarf.CompilationUnit.imported_functions`
+    :cpp:func:`LIEF::dwarf::CompilationUnit::imported_functions`
+
 .. |lief-dwarf-debug-info| lief-api:: lief.dwarf.DebugInfo
 
     :rust:struct:`lief::dwarf::DebugInfo`
@@ -250,6 +262,14 @@
 
     :py:class:`lief.ELF.AArch64PAuth`
     :cpp:class:`LIEF::ELF::AArch64PAuth`
+
+.. |lief-elf-relocation-resolve| lief-api:: lief.ELF.Relocation.resolve()
+
+    :rust:method:`lief::elf::Relocation::resolve [struct]`
+    :rust:method:`lief::elf::Relocation::resolve_with_base_address [struct]`
+    :py:func:`lief.ELF.Relocation.resolve`
+    :cpp:func:`LIEF::ELF::Relocation::resolve`
+
 
 .. Mach-O ======================================================================
 
