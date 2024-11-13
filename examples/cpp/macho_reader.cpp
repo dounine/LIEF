@@ -66,11 +66,11 @@ void print_binary(const Binary& binary) {
 int main(int argc, char **argv) {
   LIEF::logging::set_level(LIEF::logging::LEVEL::DEBUG);
   std::cout << "MachO Reader" << '\n';
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " <MachO binary>" << '\n';
-    return -1;
-  }
-  std::unique_ptr<FatBinary> binaries = Parser::parse(argv[1]);
+//  if (argc != 2) {
+//    std::cerr << "Usage: " << argv[0] << " <MachO binary>" << '\n';
+//    return -1;
+//  }
+  std::unique_ptr<FatBinary> binaries = Parser::parse("/Users/lake/dounine/github/apple/LIEF/data/macho");
 
   for (const Binary& binary : *binaries) {
     print_binary(binary);

@@ -84,6 +84,10 @@ inline void enable_debug() {
   set_level(LEVEL::DEBUG);
 }
 
+inline void enable_info() {
+    set_level(LEVEL::INFO);
+}
+
 inline void debug(const std::string& msg) {
   log(LEVEL::DEBUG, msg);
 }

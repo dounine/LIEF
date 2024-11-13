@@ -17,23 +17,29 @@
 #include <memory>
 
 #include <LIEF/MachO.hpp>
+#include "LIEF/logging.hpp"
 
 using namespace LIEF;
 
 int main(int argc, char **argv) {
-  std::cout << "MachO Rebuilder" << '\n';
-  if (argc != 3) {
-    std::cerr << "Usage: " << argv[0] << " <Input Binary> <Output Binary>" << "\n";
-    return 1;
-  }
+    std::cout << "MachO Rebuilder" << '\n';
+//  if (argc != 3) {
+//    std::cerr << "Usage: " << argv[0] << " <Input Binary> <Output Binary>" << "\n";
+//    return 1;
+//  }
+    LIEF::logging::enable_info();
+    std::unique_ptr<LIEF::MachO::FatBinary> fat = MachO::Parser::parse(
+            "/Users/lake/dounine/github/apple/LIEF/data/macho");
+//  fat->at(0)->add_library("/Users/lake/dounine/github/apple/LIEF/data/macho.dylib");
+    LIEF::logging::info("hello");
+    fat->at(0)->shift(0x4000);
+//    fat->write("/Users/lake/dounine/github/apple/LIEF/data/macho2");
+//  MachO::Binary* binary = fat->back();
+//  if (binary == nullptr) {
+//    std::cerr << "Can't access binary" << "\n";
+//    return 1;
+//  }
+//  binary->write(argv[2]);
 
-  std::unique_ptr<LIEF::MachO::FatBinary> fat = MachO::Parser::parse(argv[1]);
-  MachO::Binary* binary = fat->back();
-  if (binary == nullptr) {
-    std::cerr << "Can't access binary" << "\n";
-    return 1;
-  }
-  binary->write(argv[2]);
-
-  return 0;
+    return 0;
 }
