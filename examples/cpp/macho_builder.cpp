@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 //  }
     LIEF::logging::enable_info();
     std::unique_ptr<LIEF::MachO::FatBinary> fat = MachO::Parser::parse(
-            "/Users/lake/dounine/github/apple/LIEF/data/macho");
+            "../../../data/macho");
 //  fat->at(0)->add_library("/Users/lake/dounine/github/apple/LIEF/data/macho.dylib");
     LIEF::logging::info("hello");
     fat->at(0)->shift(0x4000);
