@@ -872,7 +872,7 @@ namespace LIEF {
             // 1. Shift all commands
             // =====================
             for (std::unique_ptr<LoadCommand> &cmd: commands_) {
-                LIEF_INFO("cmd offset: {:x} end_offset: {:x} {:}", cmd->command_offset(), loadcommands_end);
+//                LIEF_INFO("cmd offset: {:x} end_offset: {:x} {:}", cmd->command_offset(), loadcommands_end);
                 if (cmd->command_offset() >= loadcommands_end) {
                     cmd->command_offset(cmd->command_offset() + value);
                 }
